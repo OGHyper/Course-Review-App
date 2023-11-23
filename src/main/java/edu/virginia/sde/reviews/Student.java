@@ -9,7 +9,7 @@ public class Student {  // Basically the user
     // Password
     private String password;
     // List of reviews
-    List<CourseReview> reviews; // This might need more to instantiate
+    private List<CourseReview> reviews; // This might need more to instantiate
 
     public String getUsername() {
         return username;
