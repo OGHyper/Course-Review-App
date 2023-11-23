@@ -39,4 +39,9 @@ public class Course {
     public void setReviews(List<CourseReview> reviews) {
         this.reviews = reviews;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s %d: %s", subjectNmeumonic, courseNumber, courseTitle);
+    }
 }
