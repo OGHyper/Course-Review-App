@@ -11,6 +11,14 @@ public class CourseReview {
     private String comment;
     private Timestamp timestamp;
 
+    public CourseReview(Course course, Student postingStudent, double rating, String comment, Timestamp timestamp) {
+        this.course = course;
+        this.postingStudent = postingStudent;
+        this.rating = rating;
+        this.comment = comment;
+        this.timestamp = timestamp;
+    }
+
     public Course getCourse() {
         return course;
     }
@@ -47,7 +55,9 @@ public class CourseReview {
         this.comment = comment;
     }
 
-    public void setTimestamp(Date date){
-        this.timestamp = new Timestamp(date.getTime());
+    public void setTimestamp(){
+        // this.timestamp = new Timestamp(date.getTime());
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        this.timestamp = timestamp;
     }
 }
