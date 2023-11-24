@@ -3,6 +3,7 @@ package edu.virginia.sde.reviews;
 import java.util.List;
 
 public class Course {
+    private int id;
     private String subjectNmeumonic;
     private int courseNumber;
     private String courseTitle;
@@ -13,6 +14,14 @@ public class Course {
         this.subjectNmeumonic = subjectNmeumonic;
         this.courseNumber = courseNumber;
         this.courseTitle = courseTitle;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getSubjectNmeumonic() {
