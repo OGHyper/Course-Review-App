@@ -3,13 +3,17 @@ package edu.virginia.sde.reviews;
 import java.util.*;
 
 public class Student {  // Basically the user
-    // What we need:
     // Username
     private String username;
     // Password
     private String password;
     // List of reviews
     private List<CourseReview> reviews; // This might need more to instantiate
+
+    public Student(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
     public String getUsername() {
         return username;

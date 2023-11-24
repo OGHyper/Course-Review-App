@@ -8,6 +8,13 @@ public class Course {
     private String courseTitle;
     private List<CourseReview> reviews;
 
+
+    public Course(String subjectNmeumonic, int courseNumber, String courseTitle) {
+        this.subjectNmeumonic = subjectNmeumonic;
+        this.courseNumber = courseNumber;
+        this.courseTitle = courseTitle;
+    }
+
     public String getSubjectNmeumonic() {
         return subjectNmeumonic;
     }
