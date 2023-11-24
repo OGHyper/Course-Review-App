@@ -7,6 +7,11 @@ import javafx.stage.Stage;
 
 public class CourseReviewsApplication extends Application {
     public static void main(String[] args){
+        launch(args);
+    }
 
+    public void start(Stage stage) throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("hello-world.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
     }
 }
