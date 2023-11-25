@@ -10,7 +10,8 @@ public class Course {
     private List<CourseReview> reviews;
 
 
-    public Course(String subjectNmeumonic, int courseNumber, String courseTitle) {
+    public Course(int id, String subjectNmeumonic, int courseNumber, String courseTitle) {
+        this.id = id;
         this.subjectNmeumonic = subjectNmeumonic;
         this.courseNumber = courseNumber;
         this.courseTitle = courseTitle;

@@ -3,6 +3,8 @@ package edu.virginia.sde.reviews;
 import java.util.*;
 
 public class Student {  // Basically the user
+    // id
+    private int id;
     // Username
     private String username;
     // Password
@@ -10,7 +12,8 @@ public class Student {  // Basically the user
     // List of reviews
     private List<CourseReview> reviews; // This might need more to instantiate
 
-    public Student(String username, String password) {
+    public Student(int id, String username, String password) {
+        this.id = id;
         this.username = username;
         this.password = password;
     }
