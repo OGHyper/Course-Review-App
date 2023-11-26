@@ -5,27 +5,37 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class CourseReview {
-    private Course course;
-    private String postingStudentID;
-    private double rating;
+    private int id;
+    private int courseID;
+    private int postingStudentID;
+    private int rating;
     private String comment;
     private Timestamp timestamp;
 
-    public CourseReview(Course course, String postingStudentID, double rating, String comment, Timestamp timestamp) {
-        this.course = course;
+    public CourseReview(int id, int courseID, int postingStudentID, int rating, String comment) {
+        this.id = id;
+        this.courseID = courseID;
         this.postingStudentID = postingStudentID;
         this.rating = rating;
         this.comment = comment;
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(System.currentTimeMillis());
     }
 
-    public Course getCourse() {
-        return course;
+    public int getId() {
+        return id;
     }
 
-    public String getPostingStudentID() {return postingStudentID;}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public double getRating() {
+    public int getCourseID() {
+        return courseID;
+    }
+
+    public int getPostingStudentID() {return postingStudentID;}
+
+    public int getRating() {
         return rating;
     }
 
@@ -37,15 +47,13 @@ public class CourseReview {
         return timestamp;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
-    }
+    public void setCourseID(int courseID) {this.courseID = courseID; }
 
-    public void setPostingStudentID(String postingStudentID) {
+    public void setPostingStudentID(int postingStudentID) {
         this.postingStudentID = postingStudentID;
     }
 
-    public void setRating(double rating) {
+    public void setRating(int rating) {
         this.rating = rating;
     }
 
@@ -53,9 +61,7 @@ public class CourseReview {
         this.comment = comment;
     }
 
-    public void setTimestamp(){
-        // this.timestamp = new Timestamp(date.getTime());
-        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-        this.timestamp = currentTimestamp;
+    public void setTimestamp(Timestamp timestamp){
+        this.timestamp = timestamp;
     }
 }

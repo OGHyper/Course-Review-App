@@ -18,6 +18,10 @@ public class Student {  // Basically the user
         this.password = password;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -28,6 +32,10 @@ public class Student {  // Basically the user
 
     public List<CourseReview> getReviews() {
         return reviews;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setUsername(String username) {
