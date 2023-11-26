@@ -6,14 +6,14 @@ import java.util.Date;
 
 public class CourseReview {
     private Course course;
-    private Student postingStudent;
+    private String postingStudentID;
     private double rating;
     private String comment;
     private Timestamp timestamp;
 
-    public CourseReview(Course course, Student postingStudent, double rating, String comment, Timestamp timestamp) {
+    public CourseReview(Course course, String postingStudentID, double rating, String comment, Timestamp timestamp) {
         this.course = course;
-        this.postingStudent = postingStudent;
+        this.postingStudentID = postingStudentID;
         this.rating = rating;
         this.comment = comment;
         this.timestamp = timestamp;
@@ -23,9 +23,7 @@ public class CourseReview {
         return course;
     }
 
-    public Student getPostingStudent() {
-        return postingStudent;
-    }
+    public String getPostingStudentID() {return postingStudentID;}
 
     public double getRating() {
         return rating;
@@ -43,8 +41,8 @@ public class CourseReview {
         this.course = course;
     }
 
-    public void setPostingStudent(Student postingStudent) {
-        this.postingStudent = postingStudent;
+    public void setPostingStudentID(String postingStudentID) {
+        this.postingStudentID = postingStudentID;
     }
 
     public void setRating(double rating) {
@@ -58,6 +56,6 @@ public class CourseReview {
     public void setTimestamp(){
         // this.timestamp = new Timestamp(date.getTime());
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-        this.timestamp = timestamp;
+        this.timestamp = currentTimestamp;
     }
 }
