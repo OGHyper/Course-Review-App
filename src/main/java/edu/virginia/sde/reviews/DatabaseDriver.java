@@ -4,6 +4,7 @@ import java.util.*;
 
 public class DatabaseDriver {
 
+    private static DatabaseDriver instance;
     private final String sqliteFilename;
     private Connection connection;
 
@@ -11,6 +12,12 @@ public class DatabaseDriver {
         this.sqliteFilename = sqlListDatabaseFilename;
     }
 
+    public static DatabaseDriver getInstance(String sqliteFilename){
+        if (instance == null){
+            instance = new DatabaseDriver(sqliteFilename);
+        }
+        return instance;
+    }
     /**
      * Connect to a SQLite Database. This turns out Foreign Key enforcement, and disables auto-commits
      *
@@ -50,38 +57,32 @@ public class DatabaseDriver {
 
     public void createTables() throws SQLException {
         if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-
-        String createCoursesTable = "CREATE TABLE IF NOT EXISTS Courses ("
-                + "	ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "	Subject VARCHAR(255) NOT NULL,"
-                + " CourseNumber INTEGER NOT NULL,"
-                + "	Title VARCHAR(255) NOT NULL"
-                + ");";
-        String createStudentsTable = "CREATE TABLE IF NOT EXISTS Students ("
-                + "	ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "	Username VARCHAR(255) NOT NULL UNIQUE,"
-                + " Password VARCHAR(255) NOT NULL"
-                + ");";
-        String createReviewsTable = "CREATE TABLE IF NOT EXISTS Reviews ("
-                + " ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " StudentID INTEGER NOT NULL,"
-                + " CourseID INTEGER NOT NULL,"
-                + " Rating INTEGER NOT NULL,"
-                + "	Comment VARCHAR(255),"
-                + " Timestamp TIMESTAMP NOT NULL,"
-                + " FOREIGN KEY (UserID) REFERENCES Users(ID) ON DELETE CASCADE,"
-                + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE"
-                + " UNIQUE (UserID, CourseID)"
-                + ");";
-
-        try {
-            Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
+            String createCoursesTable = "CREATE TABLE IF NOT EXISTS Courses ("
+                    + "	ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + "	Subject VARCHAR(255) NOT NULL,"
+                    + " CourseNumber INTEGER NOT NULL,"
+                    + "	Title VARCHAR(255) NOT NULL"
+                    + ");";
             statement.executeUpdate(createCoursesTable);
+            String createStudentsTable = "CREATE TABLE IF NOT EXISTS Students ("
+                    + "	ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + "	Username VARCHAR(255) NOT NULL UNIQUE,"
+                    + " Password VARCHAR(255) NOT NULL"
+                    + ");";
             statement.executeUpdate(createStudentsTable);
+            String createReviewsTable = "CREATE TABLE IF NOT EXISTS Reviews ("
+                    + " ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + " StudentID INTEGER NOT NULL,"
+                    + " CourseID INTEGER NOT NULL,"
+                    + " Rating INTEGER NOT NULL,"
+                    + "	Comment VARCHAR(255),"
+                    + " Timestamp TIMESTAMP NOT NULL,"
+                    + " FOREIGN KEY (StudentID) REFERENCES Students(ID) ON DELETE CASCADE,"
+                    + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE"
+                    + " UNIQUE (StudentID, CourseID)"
+                    + ");";
             statement.executeUpdate(createReviewsTable);
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -122,10 +123,7 @@ public class DatabaseDriver {
             }catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
         }
-
         return exists;
     }
 
@@ -144,7 +142,7 @@ public class DatabaseDriver {
                 courses.add(newCourse);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return courses;
@@ -164,7 +162,7 @@ public class DatabaseDriver {
                 return Optional.of(new Course(id, subject, courseNumber, title));
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return Optional.empty();
@@ -182,7 +180,7 @@ public class DatabaseDriver {
                 return id;
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         throw new SQLException("No course with subject, number, and title found.");
@@ -204,7 +202,7 @@ public class DatabaseDriver {
                 courses.add(newCourse);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return courses;
@@ -226,7 +224,7 @@ public class DatabaseDriver {
                 courses.add(newCourse);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return courses;
@@ -248,7 +246,7 @@ public class DatabaseDriver {
                 courses.add(newCourse);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return courses;
@@ -281,7 +279,7 @@ public class DatabaseDriver {
                 students.add(newStudent);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return students;
@@ -301,13 +299,8 @@ public class DatabaseDriver {
                     int count = resultSet.getInt(1);
                     exists = count > 0;
                 }
-            }catch (SQLException e) {
-                throw new RuntimeException(e);
             }
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
         }
-
         return exists;
     }
 
@@ -323,7 +316,7 @@ public class DatabaseDriver {
                 return id;
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         throw new SQLException("No student with username: " + username + "found.");
@@ -342,7 +335,7 @@ public class DatabaseDriver {
                 return Optional.of(new Student(id, username, password));
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return Optional.empty();
@@ -361,7 +354,7 @@ public class DatabaseDriver {
                 return Optional.of(new Student(id, username2, password));
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return Optional.empty();
@@ -378,7 +371,7 @@ public class DatabaseDriver {
                 return Optional.of(password);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return Optional.empty();
@@ -480,9 +473,36 @@ public class DatabaseDriver {
                 reviews.add(newReview);
             }
             statement.close();
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return reviews;
+    }
+
+    public Optional<CourseReview> getReviewById(int reviewID) throws SQLException{
+        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
+        try{
+            PreparedStatement statement = connection.prepareStatement("SELECT * from Reviews where ID=?");
+            statement.setInt(1, reviewID);
+            ResultSet results = statement.executeQuery();
+            if (results.next()) {
+                int id = results.getInt("ID");
+                int userid = results.getInt("UserID");
+                int courseid = results.getInt("CourseID");
+                int rating = results.getInt("Rating");
+                String comment = results.getString("Comment");
+                Timestamp timestamp = results.getTimestamp("Timestamp");
+                if (results.wasNull()) {
+                    comment = null;
+                }
+                CourseReview newCR = new CourseReview(id, courseid, userid, rating, comment);
+                newCR.setTimestamp(timestamp);
+                return Optional.of(newCR);
+            }
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Optional.empty();
     }
 }
