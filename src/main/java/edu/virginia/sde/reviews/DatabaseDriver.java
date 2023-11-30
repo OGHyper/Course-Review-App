@@ -402,26 +402,6 @@ public class DatabaseDriver {
         }
     }
 
-    public void removeReview(Course course, Student student) throws SQLException{
-        if (connection.isClosed()) {
-            throw new IllegalStateException("Connection is not open");
-        }
-        try {
-            String deleteQuery = "DELETE FROM Reviews WHERE CourseID = ? AND StudentID = ?";
-            PreparedStatement statement = connection.prepareStatement(deleteQuery);
-            statement.setInt(1, getCourseId(course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
-            statement.setInt(2, getStudentId(student.getUsername()));
-            int rowsAffected = statement.executeUpdate();
-            statement.close();
-            if (rowsAffected == 0) {
-                throw new SQLException("No review found for Course ID: " + course.getId() + " and User ID: " + student.getId());
-            }
-        } catch (SQLException e) {
-            rollback();
-            throw e;
-        }
-    }
-
     public void editReview(CourseReview oldReview, CourseReview newReview) throws SQLException{
         if (connection.isClosed()) {
             throw new IllegalStateException("Connection is not open");
@@ -437,14 +417,32 @@ public class DatabaseDriver {
             } else {
                 statement.setNull(3, Types.VARCHAR);
             }
-
-            // Use the Course ID and User ID from the old review to identify the review to update
             statement.setInt(4, oldReview.getCourseID());
             statement.setInt(5, oldReview.getPostingStudentID());
             int rowsAffected = statement.executeUpdate();
             statement.close();
             if (rowsAffected == 0) {
                 throw new SQLException("No review found for Course ID: " + oldReview.getCourseID() + " and User ID: " + oldReview.getPostingStudentID());
+            }
+        } catch (SQLException e) {
+            rollback();
+            throw e;
+        }
+    }
+
+    public void removeReview(Course course, Student student) throws SQLException{
+        if (connection.isClosed()) {
+            throw new IllegalStateException("Connection is not open");
+        }
+        try {
+            String deleteQuery = "DELETE FROM Reviews WHERE CourseID = ? AND StudentID = ?";
+            PreparedStatement statement = connection.prepareStatement(deleteQuery);
+            statement.setInt(1, getCourseId(course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
+            statement.setInt(2, getStudentId(student.getUsername()));
+            int rowsAffected = statement.executeUpdate();
+            statement.close();
+            if (rowsAffected == 0) {
+                throw new SQLException("No review found for Course ID: " + course.getId() + " and User ID: " + student.getId());
             }
         } catch (SQLException e) {
             rollback();
