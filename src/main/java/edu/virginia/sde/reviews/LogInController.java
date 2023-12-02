@@ -14,5 +14,6 @@ public class LogInController {
     public void login(ActionEvent event){
         // Check if the user is in the database, then sign in and switch scenes
         // If the user is not in the database, then display error message
+        // Check if the username is right but the password is not. Maybe use two booleans
     }
 }
