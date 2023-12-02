@@ -14,6 +14,7 @@ public class CourseReviewsApplication extends Application {
     public void start(Stage stage) throws Exception {
         this.dbDriver = DatabaseDriver.getInstance(new Configuration().getDatabaseFilename());
         dbDriver.connect();
+        dbDriver.createTables();
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("log-in.fxml"));
         Scene logInScene = new Scene(fxmlLoader.load());

@@ -2,5 +2,5 @@
   "name": "CourseReviews",
   "version": "1.0.0",
   "dependencies": {},
-  "database": "course_reviews.sqlite"
+  "database": "course_reviews.sqlite3"
 }

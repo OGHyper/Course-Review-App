@@ -21,17 +21,22 @@ public class DatabaseDriver {
     /**
      * Connect to a SQLite Database. This turns out Foreign Key enforcement, and disables auto-commits
      *
-     * @throws SQLException
+     *
      */
-    public void connect() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            throw new IllegalStateException("The connection is already opened");
+    public void connect(){
+        try {
+            if (connection != null && !connection.isClosed()) {
+                throw new IllegalStateException("The connection is already opened");
+            }
+            connection = DriverManager.getConnection("jdbc:sqlite:" + sqliteFilename);
+            //the next line enables foreign key enforcement - do not delete/comment out
+            connection.createStatement().execute("PRAGMA foreign_keys = ON");
+            //the next line disables auto-commit - do not delete/comment out
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        connection = DriverManager.getConnection("jdbc:sqlite:" + sqliteFilename);
-        //the next line enables foreign key enforcement - do not delete/comment out
-        connection.createStatement().execute("PRAGMA foreign_keys = ON");
-        //the next line disables auto-commit - do not delete/comment out
-        connection.setAutoCommit(false);
+
     }
 
     /**
@@ -56,6 +61,7 @@ public class DatabaseDriver {
     }
 
     public void createTables() throws SQLException {
+        System.out.println("Entered createTables");
         if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         try (Statement statement = connection.createStatement()) {
             String createCoursesTable = "CREATE TABLE IF NOT EXISTS Courses ("
@@ -80,9 +86,10 @@ public class DatabaseDriver {
                     + " Timestamp TIMESTAMP NOT NULL,"
                     + " FOREIGN KEY (StudentID) REFERENCES Students(ID) ON DELETE CASCADE,"
                     + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE"
-                    + " UNIQUE (StudentID, CourseID)"
                     + ");";
             statement.executeUpdate(createReviewsTable);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -408,7 +415,7 @@ public class DatabaseDriver {
         }
 
         try {
-            String updateQuery = "UPDATE Reviews SET Rating = ?, Timestamp = ?, Comment = ? WHERE CourseID = ? AND UserID = ?";
+            String updateQuery = "UPDATE Reviews SET Rating = ?, Timestamp = ?, Comment = ? WHERE CourseID = ? AND StudentID = ?";
             PreparedStatement statement = connection.prepareStatement(updateQuery);
             statement.setInt(1, newReview.getRating());
             statement.setTimestamp(2, newReview.getTimestamp());

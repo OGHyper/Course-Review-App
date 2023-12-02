@@ -1,5 +1,13 @@
 package edu.virginia.sde.reviews;
 
-public class LogInController {
+import javafx.event.ActionEvent;
 
+public class LogInController {
+    public void register(ActionEvent event){
+
+    }
+
+    public void login(ActionEvent event){
+
+    }
 }
