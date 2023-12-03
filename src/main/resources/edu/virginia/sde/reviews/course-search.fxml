@@ -26,5 +26,10 @@
       <TextField fx:id="courseTitle" layoutX="175.0" layoutY="89.0" prefHeight="26.0" prefWidth="130.0" />
       <Button layoutX="325.0" layoutY="89.0" mnemonicParsing="false" onAction="#searchCourse" text="Search" />
       <Button layoutX="393.0" layoutY="89.0" mnemonicParsing="false" onAction="#registerCourse" text="Register" />
+      <Label fx:id="buttonMessage" alignment="CENTER" layoutX="325.0" layoutY="123.0" prefHeight="18.0" prefWidth="130.0">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

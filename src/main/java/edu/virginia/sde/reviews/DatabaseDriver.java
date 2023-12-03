@@ -91,52 +91,41 @@ public class DatabaseDriver {
     }
 
     // Insert Database functions here
-    public void addCourse(Course course) throws SQLException{
-        try {
-            if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-            String command = String.format("INSERT INTO Courses(ID,Subject,CourseNumber,Title) VALUES(null,%s,%d,%s)",
-                                            course.getSubjectNmeumonic(),
-                                            course.getCourseNumber(),
-                                            course.getCourseTitle());
-            PreparedStatement statement = connection.prepareStatement(command);
-            statement.executeUpdate();
-            statement.close();
-        } catch (SQLException e) {
-            rollback();
-            throw e;
-        }
+    public void addCourse(Course course) throws SQLException {
+        String command = "INSERT INTO Courses(ID,Subject,CourseNumber,Title) VALUES(null,?,?,?)";
+        PreparedStatement statement = connection.prepareStatement(command);
+        statement.setString(1, course.getSubjectNmeumonic());
+        statement.setInt(2, course.getCourseNumber());
+        statement.setString(3, course.getCourseTitle());
+        statement.executeUpdate();
+        statement.close();
     }
 
     public boolean courseAlreadyExists(String subject, int courseNumber, String title) throws SQLException{
-        if (connection.isClosed()) {
-            throw new IllegalStateException("Connection is not open");
-        }
-        boolean exists = false;
-        String query = String.format("SELECT COUNT(*) FROM Courses WHERE Subject = %s AND CourseNumber = %d AND Title = %s",
-                                    subject,
-                                    courseNumber,
-                                    title);
-
+        boolean doesCourseExist = false;
+        String query = "SELECT COUNT(*) FROM Courses WHERE Subject = ? AND CourseNumber = ? AND Title = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-
+            statement.setString(1, subject);
+            statement.setInt(2, courseNumber);
+            statement.setString(3, title);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int count = resultSet.getInt(1);
-                    exists = count > 0;
+                    doesCourseExist = count > 0;
                 }
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
-        return exists;
+        return doesCourseExist;
     }
 
     public List<Course> getAllCourses() throws SQLException {
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         var courses = new ArrayList<Course>();
         try{
             PreparedStatement statement = connection.prepareStatement("SELECT * from Courses");
             ResultSet results = statement.executeQuery();
+            // Maybe try changing this to a for each loop
             while (results.next()) {
                 String subject = results.getString("Subject");
                 int courseNumber = results.getInt("CourseNumber");
@@ -211,11 +200,11 @@ public class DatabaseDriver {
     }
 
     public List<Course> getCoursesByNumber(int courseNumber) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         var courses = new ArrayList<Course>();
         try{
-            String preparedStatement = String.format("SELECT * from Courses where CourseNumber=%d", courseNumber);
+            String preparedStatement = "SELECT * from Courses where CourseNumber=?";
             PreparedStatement statement = connection.prepareStatement(preparedStatement);
+            statement.setInt(1, courseNumber);
             ResultSet results = statement.executeQuery();
             while (results.next()) {
                 int id = results.getInt("ID");
@@ -239,6 +228,7 @@ public class DatabaseDriver {
             PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where Title LIKE '%'||?||'%'");
             statement.setString(1, subString);
             ResultSet results = statement.executeQuery();
+            // Try changing this to a for each loop
             while (results.next()) {
                 int id = results.getInt("ID");
                 String subject = results.getString("Subject");
@@ -270,7 +260,6 @@ public class DatabaseDriver {
     }
 
     public List<Student> getAllStudents() throws SQLException {
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         var students = new ArrayList<Student>();
         try{
             PreparedStatement statement = connection.prepareStatement("SELECT * from Students");
@@ -289,10 +278,7 @@ public class DatabaseDriver {
         return students;
     }
 
-    public boolean studentExists(String username)throws SQLException{
-        if (connection.isClosed()) {
-            throw new IllegalStateException("Connection is not open");
-        }
+    public boolean studentExists(String username){
         boolean exists = false;
         String query = "SELECT COUNT(*) FROM Students WHERE Username = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -302,11 +288,9 @@ public class DatabaseDriver {
                     int count = resultSet.getInt(1);
                     exists = count > 0;
                 }
-            } catch (SQLException e){
-                throw new RuntimeException();
             }
-        } catch (SQLException e){
-            throw new RuntimeException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return exists;
     }
