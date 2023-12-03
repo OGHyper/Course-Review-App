@@ -6,10 +6,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.virginia.sde.reviews.CourseSearchController">
    <children>
-      <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="59.0" text="Back">
+      <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#returnToLogin" prefHeight="38.0" prefWidth="59.0" text="Back">
          <font>
             <Font size="14.0" />
          </font>
@@ -22,10 +21,10 @@
       <Label layoutX="49.0" layoutY="69.0" prefHeight="18.0" prefWidth="47.0" text="Subject:" />
       <Label layoutX="110.0" layoutY="70.0" text="Course #:" />
       <Label layoutX="175.0" layoutY="69.0" text="Title:" />
-      <TextField layoutX="49.0" layoutY="89.0" prefHeight="26.0" prefWidth="47.0" />
-      <TextField layoutX="110.0" layoutY="89.0" prefHeight="26.0" prefWidth="47.0" />
-      <TextField layoutX="175.0" layoutY="89.0" prefHeight="26.0" prefWidth="130.0" />
-      <Button layoutX="325.0" layoutY="89.0" mnemonicParsing="false" text="Search" />
-      <Button layoutX="393.0" layoutY="89.0" mnemonicParsing="false" text="Register" />
+      <TextField fx:id="courseSubject" layoutX="49.0" layoutY="89.0" prefHeight="26.0" prefWidth="47.0" />
+      <TextField fx:id="courseNumber" layoutX="110.0" layoutY="89.0" prefHeight="26.0" prefWidth="47.0" />
+      <TextField fx:id="courseTitle" layoutX="175.0" layoutY="89.0" prefHeight="26.0" prefWidth="130.0" />
+      <Button layoutX="325.0" layoutY="89.0" mnemonicParsing="false" onAction="#searchCourse" text="Search" />
+      <Button layoutX="393.0" layoutY="89.0" mnemonicParsing="false" onAction="#registerCourse" text="Register" />
    </children>
 </AnchorPane>

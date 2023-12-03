@@ -138,11 +138,10 @@ public class DatabaseDriver {
             PreparedStatement statement = connection.prepareStatement("SELECT * from Courses");
             ResultSet results = statement.executeQuery();
             while (results.next()) {
-                int id = results.getInt("ID");
                 String subject = results.getString("Subject");
                 int courseNumber = results.getInt("CourseNumber");
                 String title = results.getString("Title");
-                Course newCourse = new Course(id, subject, courseNumber, title);
+                Course newCourse = new Course(subject, courseNumber, title);
                 courses.add(newCourse);
             }
             statement.close();
@@ -159,11 +158,10 @@ public class DatabaseDriver {
             ResultSet results = statement.executeQuery();
 
             if (results.next()) {
-                int id = results.getInt("ID");
                 String subject = results.getString("Subject");
                 int courseNumber = results.getInt("CourseNumber");
                 String title = results.getString("Title");
-                return Optional.of(new Course(id, subject, courseNumber, title));
+                return Optional.of(new Course(subject, courseNumber, title));
             }
             statement.close();
         } catch (SQLException e) {
@@ -202,7 +200,7 @@ public class DatabaseDriver {
                 String subject = results.getString("Subject");
                 int courseNumber = results.getInt("CourseNumber");
                 String title = results.getString("Title");
-                var newCourse = new Course(id, subject, courseNumber, title);
+                var newCourse = new Course(subject, courseNumber, title);
                 courses.add(newCourse);
             }
             statement.close();
@@ -224,7 +222,7 @@ public class DatabaseDriver {
                 String subject = results.getString("Subject");
                 int number = results.getInt("CourseNumber");
                 String title = results.getString("Title");
-                var newCourse = new Course(id, subject, number, title);
+                var newCourse = new Course(subject, number, title);
                 courses.add(newCourse);
             }
             statement.close();
@@ -246,7 +244,7 @@ public class DatabaseDriver {
                 String subject = results.getString("Subject");
                 int number = results.getInt("CourseNumber");
                 String title = results.getString("Title");
-                var newCourse = new Course(id, subject, number, title);
+                var newCourse = new Course(subject, number, title);
                 courses.add(newCourse);
             }
             statement.close();
@@ -259,10 +257,8 @@ public class DatabaseDriver {
     public void addStudent(Student student) throws SQLException{
         try {
             if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-            String command = "INSERT INTO Students (Username,Password) VALUES(?,?)";
+            String command = "INSERT INTO Students (Username, Password) VALUES (?,?)";
             PreparedStatement statement = connection.prepareStatement(command);
-            System.out.println(student.getUsername());
-            System.out.println(student.getId());
             statement.setString(1, student.getUsername());
             statement.setString(2, student.getPassword());
             statement.executeUpdate();
@@ -298,16 +294,19 @@ public class DatabaseDriver {
             throw new IllegalStateException("Connection is not open");
         }
         boolean exists = false;
-        String query = String.format("SELECT COUNT(*) FROM Students WHERE Username = %s", username);
-
+        String query = "SELECT COUNT(*) FROM Students WHERE Username = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-
+            statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int count = resultSet.getInt(1);
                     exists = count > 0;
                 }
+            } catch (SQLException e){
+                throw new RuntimeException();
             }
+        } catch (SQLException e){
+            throw new RuntimeException();
         }
         return exists;
     }
@@ -352,8 +351,9 @@ public class DatabaseDriver {
     public Optional<Student> getStudentByUsername(String username) throws SQLException{
         if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         try{
-            String preparedStatement = String.format("SELECT * from Students where username=%s", username);
+            String preparedStatement = "SELECT * from Students where username=%s";
             PreparedStatement statement = connection.prepareStatement(preparedStatement);
+            statement.setString(1, username);
             ResultSet results = statement.executeQuery();
             if (results.next()) {
                 int id = results.getInt("ID");
@@ -371,8 +371,9 @@ public class DatabaseDriver {
     public Optional<String> getPasswordForStudent(Student student) throws SQLException{
         if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         try{
-            String preparedStatement = String.format("SELECT * from Users where username=%s", student.getUsername());
+            String preparedStatement = "SELECT * from Students where username=?";
             PreparedStatement statement = connection.prepareStatement(preparedStatement);
+            statement.setString(1, student.getUsername());
             ResultSet results = statement.executeQuery();
             if (results.next()) {
                 String password = results.getString("Password");
@@ -430,7 +431,7 @@ public class DatabaseDriver {
             int rowsAffected = statement.executeUpdate();
             statement.close();
             if (rowsAffected == 0) {
-                throw new SQLException("No review found for Course ID: " + oldReview.getCourseID() + " and User ID: " + oldReview.getPostingStudentID());
+                throw new SQLException("No review found for Course ID: " + oldReview.getCourseID() + " and Student ID: " + oldReview.getPostingStudentID());
             }
         } catch (SQLException e) {
             rollback();
@@ -450,7 +451,7 @@ public class DatabaseDriver {
             int rowsAffected = statement.executeUpdate();
             statement.close();
             if (rowsAffected == 0) {
-                throw new SQLException("No review found for Course ID: " + course.getId() + " and User ID: " + student.getId());
+                throw new SQLException("No review found for Course ID: " + course.getId() + " and Student ID: " + student.getId());
             }
         } catch (SQLException e) {
             rollback();
@@ -493,7 +494,7 @@ public class DatabaseDriver {
             ResultSet results = statement.executeQuery();
             if (results.next()) {
                 int id = results.getInt("ID");
-                int userid = results.getInt("UserID");
+                int userid = results.getInt("StudentID");
                 int courseid = results.getInt("CourseID");
                 int rating = results.getInt("Rating");
                 String comment = results.getString("Comment");
