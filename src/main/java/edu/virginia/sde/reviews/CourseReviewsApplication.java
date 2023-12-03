@@ -18,7 +18,10 @@ public class CourseReviewsApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("log-in.fxml"));
         Scene logInScene = new Scene(fxmlLoader.load());
-        stage.setTitle("Course Review");
+        LogInController logInController = fxmlLoader.getController();
+        logInController.setApplication(this);
+        logInController.setDatabaseDriver(dbDriver);
+        stage.setTitle("Course Review - Log in");
         stage.setScene(logInScene);
         stage.show();
     }

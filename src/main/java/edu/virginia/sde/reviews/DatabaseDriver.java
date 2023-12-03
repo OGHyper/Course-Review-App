@@ -61,21 +61,19 @@ public class DatabaseDriver {
     }
 
     public void createTables() throws SQLException {
-        System.out.println("Entered createTables");
+        //System.out.println("Entered createTables");
         if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         try (Statement statement = connection.createStatement()) {
             String createCoursesTable = "CREATE TABLE IF NOT EXISTS Courses ("
                     + "	ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "	Subject VARCHAR(255) NOT NULL,"
                     + " CourseNumber INTEGER NOT NULL,"
-                    + "	Title VARCHAR(255) NOT NULL"
-                    + ");";
+                    + "	Title VARCHAR(255) NOT NULL);";
             statement.executeUpdate(createCoursesTable);
             String createStudentsTable = "CREATE TABLE IF NOT EXISTS Students ("
                     + "	ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "	Username VARCHAR(255) NOT NULL UNIQUE,"
-                    + " Password VARCHAR(255) NOT NULL"
-                    + ");";
+                    + " Password VARCHAR(255) NOT NULL);";
             statement.executeUpdate(createStudentsTable);
             String createReviewsTable = "CREATE TABLE IF NOT EXISTS Reviews ("
                     + " ID INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -85,8 +83,7 @@ public class DatabaseDriver {
                     + "	Comment VARCHAR(255),"
                     + " Timestamp TIMESTAMP NOT NULL,"
                     + " FOREIGN KEY (StudentID) REFERENCES Students(ID) ON DELETE CASCADE,"
-                    + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE"
-                    + ");";
+                    + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE);";
             statement.executeUpdate(createReviewsTable);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -262,8 +259,12 @@ public class DatabaseDriver {
     public void addStudent(Student student) throws SQLException{
         try {
             if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-            String command = String.format("INSERT INTO Students(ID,Username,Password) VALUES(null,%s,%s)", student.getUsername(), student.getPassword());
+            String command = "INSERT INTO Students (Username,Password) VALUES(?,?)";
             PreparedStatement statement = connection.prepareStatement(command);
+            System.out.println(student.getUsername());
+            System.out.println(student.getId());
+            statement.setString(1, student.getUsername());
+            statement.setString(2, student.getPassword());
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
@@ -282,7 +283,7 @@ public class DatabaseDriver {
                 int id = results.getInt("ID");
                 String username = results.getString("Username");
                 String password = results.getString("Password");
-                var newStudent = new Student(id, username, password);
+                var newStudent = new Student(username, password);
                 students.add(newStudent);
             }
             statement.close();
@@ -339,7 +340,7 @@ public class DatabaseDriver {
                 int id = results.getInt("ID");
                 String username = results.getString("Username");
                 String password = results.getString("Password");
-                return Optional.of(new Student(id, username, password));
+                return Optional.of(new Student(username, password));
             }
             statement.close();
         } catch (SQLException e) {
@@ -358,7 +359,7 @@ public class DatabaseDriver {
                 int id = results.getInt("ID");
                 String username2 = results.getString("Username");
                 String password = results.getString("Password");
-                return Optional.of(new Student(id, username2, password));
+                return Optional.of(new Student(username2, password));
             }
             statement.close();
         } catch (SQLException e) {

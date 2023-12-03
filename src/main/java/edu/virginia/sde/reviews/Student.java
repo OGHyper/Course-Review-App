@@ -12,8 +12,7 @@ public class Student {  // Basically the user
     // List of reviews
     private List<CourseReview> reviews; // This might need more to instantiate
 
-    public Student(int id, String username, String password) {
-        this.id = id;
+    public Student(String username, String password) {
         this.username = username;
         this.password = password;
     }
