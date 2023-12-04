@@ -6,19 +6,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Paint;
-import javafx.stage.Stage;
 import javafx.scene.control.TextField;
-
 import java.net.URL;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 
 public class CourseSearchController implements Initializable {
     private final Paint red = Paint.valueOf("b12525");
@@ -26,7 +21,7 @@ public class CourseSearchController implements Initializable {
     private final Paint green = Paint.valueOf("#37e127");
     private Student loggedInStudent;
     private CourseReviewsApplication application;
-    private final DatabaseDriver db = DatabaseDriver.getInstance(new Configuration().getDatabaseFilename());;
+    private final DatabaseDriver db = DatabaseDriver.getInstance(new Configuration().getDatabaseFilename());
 
     @FXML
     private TextField courseSubject;
@@ -44,7 +39,6 @@ public class CourseSearchController implements Initializable {
         List<Course> allCoursesSorted = allCourses.stream()
                 .sorted(Comparator.comparing(Course::getSubjectNmeumonic))
                 .toList();
-        // TODO: Try to get this to be sorted by course number too
         return allCoursesSorted;
     }
 
@@ -140,8 +134,7 @@ public class CourseSearchController implements Initializable {
     public void registerCourse(ActionEvent event) throws SQLException {
         String subject = courseSubject.getText();
         String title = courseTitle.getText();
-        // TODO: I need to check if it is a number being inputted
-        int number = 0;
+        int number = 0; // This should be changed under all circumstances
         if (subject.isEmpty() || courseNumber.getText().isEmpty() || title.isEmpty()){
             handleButton("Cannot have empty fields", red);
             return;
@@ -179,7 +172,11 @@ public class CourseSearchController implements Initializable {
     }
 
     public void goToMyReviews(ActionEvent event) throws Exception {
-        application.goToMyReviews();
+        application.goToMyReviews(loggedInStudent);
+    }
+
+    public void goToCourseReviews(ActionEvent event){
+        // TODO: Implement this
     }
 
     public void setApplication(CourseReviewsApplication application){

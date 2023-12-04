@@ -48,4 +48,8 @@ public class Student {  // Basically the user
     public void setReviews(List<CourseReview> reviews) {
         this.reviews = reviews;
     }
+
+    public void addReview(CourseReview review){
+        this.reviews.add(review);
+    }
 }

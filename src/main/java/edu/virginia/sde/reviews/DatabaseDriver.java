@@ -1,4 +1,5 @@
 package edu.virginia.sde.reviews;
+
 import java.sql.*;
 import java.util.*;
 
@@ -322,20 +323,15 @@ public class DatabaseDriver {
     }
 
     public Optional<String> getPasswordForStudent(Student student) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-        try{
-            String preparedStatement = "SELECT * from Students where username=?";
-            PreparedStatement statement = connection.prepareStatement(preparedStatement);
-            statement.setString(1, student.getUsername());
-            ResultSet results = statement.executeQuery();
-            if (results.next()) {
-                String password = results.getString("Password");
-                return Optional.of(password);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        String preparedStatement = "SELECT * from Students where username=?";
+        PreparedStatement statement = connection.prepareStatement(preparedStatement);
+        statement.setString(1, student.getUsername());
+        ResultSet results = statement.executeQuery();
+        if (results.next()) {
+            String password = results.getString("Password");
+            return Optional.of(password);
         }
+        statement.close();
         return Optional.empty();
     }
 
@@ -353,7 +349,7 @@ public class DatabaseDriver {
                 if (results.wasNull()) {
                     comment = null;
                 }
-                var newReview = new CourseReview(courseid, studentID, rating, comment);
+                var newReview = new CourseReview(courseid, studentID, rating, comment, timestamp);
                 newReview.setTimestamp(timestamp);  // Sets the new timestamp to have recorded timestamp
                 reviews.add(newReview);
             }
@@ -379,5 +375,24 @@ public class DatabaseDriver {
         }
         statement.executeUpdate();
         statement.close();
+    }
+
+    public List<CourseReview> getReviewsFromStudent(Student student) throws SQLException {
+        var reviews = new ArrayList<CourseReview>();
+        String command = "SELECT * FROM Reviews WHERE StudentID = ?";
+        PreparedStatement statement = connection.prepareStatement(command);
+        statement.setInt(1, getStudentId(student.getUsername()));
+        ResultSet results = statement.executeQuery();
+        while(results.next()){
+            int courseID = results.getInt("CourseID");
+            int studentID = results.getInt("StudentID");
+            int rating = results.getInt("Rating");
+            String comment = results.getString("Comment");
+            Timestamp timestamp = results.getTimestamp("Timestamp");
+            CourseReview review = new CourseReview(courseID, studentID, rating, comment, timestamp);
+            reviews.add(review);
+        }
+        statement.close();
+        return reviews;
     }
 }

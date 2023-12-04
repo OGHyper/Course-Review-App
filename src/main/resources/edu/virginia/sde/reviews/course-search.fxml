@@ -32,7 +32,7 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <Button layoutX="456.0" layoutY="347.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="My Reviews" />
+      <Button layoutX="456.0" layoutY="347.0" mnemonicParsing="false" onAction="#goToMyReviews" prefHeight="26.0" prefWidth="80.0" text="My Reviews" />
       <ListView fx:id="courseList" layoutX="49.0" layoutY="128.0" prefHeight="246.0" prefWidth="402.0" />
    </children>
 </AnchorPane>

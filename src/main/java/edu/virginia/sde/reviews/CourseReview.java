@@ -1,8 +1,7 @@
 package edu.virginia.sde.reviews;
 
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.*;
+import java.util.*;
 
 public class CourseReview {
     private int id;
@@ -12,12 +11,12 @@ public class CourseReview {
     private String comment;
     private Timestamp timestamp;
 
-    public CourseReview(int courseID, int postingStudentID, int rating, String comment) {
+    public CourseReview(int courseID, int postingStudentID, int rating, String comment, Timestamp timestamp) {
         this.courseID = courseID;
         this.postingStudentID = postingStudentID;
         this.rating = rating;
         this.comment = comment;
-        this.timestamp = new Timestamp(System.currentTimeMillis());
+        this.timestamp = timestamp;
     }
 
     public int getCourseID() {
@@ -54,5 +53,13 @@ public class CourseReview {
 
     public void setTimestamp(Timestamp timestamp){
         this.timestamp = timestamp;
+    }
+
+    public void updateTimestamp(){
+        this.timestamp = new Timestamp(System.currentTimeMillis());
+    }
+
+    public String toString(){
+        return "";
     }
 }

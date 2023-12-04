@@ -54,7 +54,7 @@ public class CourseReviewsApplication extends Application {
         mainStage.show();
     }
 
-    public void goToMyReviews() throws Exception {
+    public void goToMyReviews(Student student) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("my-reviews.fxml"));
         Scene myReviewsScene = new Scene(fxmlLoader.load());
         LogInController logInController = fxmlLoader.getController();
