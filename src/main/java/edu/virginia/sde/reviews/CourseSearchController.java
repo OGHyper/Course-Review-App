@@ -49,25 +49,45 @@ public class CourseSearchController implements Initializable {
         String subject = courseSubject.getText();
         int number = Integer.parseInt(courseNumber.getText());
         String title = courseTitle.getText();
-        if (!db.courseAlreadyExists(subject, number, title)){
+        if ((!subject.isEmpty() || !title.isEmpty() || !String.valueOf(number).isEmpty()) && !db.courseAlreadyExists(subject, number, title)){
+            // If all fields are filled and does not exist
             handleButton("Course does not exist", red);
         }
+        else if (!subject.isEmpty() || !title.isEmpty() || !String.valueOf(number).isEmpty()){
+
+        }
         else{
-            // TODO: Searching for the courses
+            // TODO: Implement searching for a course
             db.getCoursesBySubject(subject);
             db.getCoursesByNumber(number);
             db.getCoursesByTitle(title);
         }
-
     }
 
     public void registerCourse(ActionEvent event) throws SQLException {
         String subject = courseSubject.getText();
-        // I might need to check if this is actually a number being passed in
-        int number = Integer.parseInt(courseNumber.getText());
         String title = courseTitle.getText();
+        // TODO: I need to check if it is a number being inputted
+        int number = 0;
         if (subject.isEmpty() || courseNumber.getText().isEmpty() || title.isEmpty()){
             handleButton("Cannot have empty fields", red);
+            return;
+        }
+        if (isNumeric(courseNumber.getText())){
+            number = Integer.parseInt(courseNumber.getText());
+        }
+        else if (!isNumeric(courseNumber.getText()) && !courseNumber.getText().isEmpty()){
+            handleButton("Invalid course number", red);
+            return;
+        }
+        if (subject.length() < 2 || subject.length() > 4){
+            handleButton("Subject MUST be 2-4 characters long", red);
+        }
+        else if (courseNumber.getText().length() != 4){
+            handleButton("Course number MUST be 4 digits long", red);
+        }
+        else if (title.length() > 50){
+            handleButton("Title MUST be <= 50 characters long", red);
         }
         else if (db.courseAlreadyExists(subject, number, title)){
             handleButton("Course already exists", red);
@@ -76,7 +96,7 @@ public class CourseSearchController implements Initializable {
             Course newCourse = new Course(subject, number, title);
             db.addCourse(newCourse);
             courseList.getItems().setAll(getAllCourses());
-            handleButton("Course added", green);
+            handleButton("Course added!", green);
         }
     }
 
@@ -104,6 +124,15 @@ public class CourseSearchController implements Initializable {
     public void handleButton(String message, Paint color) {
         buttonMessage.setTextFill(color);
         buttonMessage.setText(message);
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
     }
 
     @Override
