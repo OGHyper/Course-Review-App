@@ -36,7 +36,7 @@ public class CourseReviewsApplication extends Application {
         Scene courseSearchScene = new Scene(fxmlLoader.load());
         CourseSearchController csController = fxmlLoader.getController();
         csController.setApplication(this);
-        csController.setDatabaseDriver(dbDriver);
+        //csController.setDatabaseDriver(dbDriver);
         csController.setLoggedInStudent(loggedInStudent);
         mainStage.setTitle("Course Review - Course Search");
         mainStage.setScene(courseSearchScene);
@@ -51,6 +51,16 @@ public class CourseReviewsApplication extends Application {
         logInController.setDatabaseDriver(dbDriver);
         mainStage.setTitle("Course Review - Log in");
         mainStage.setScene(logInScene);
+        mainStage.show();
+    }
+
+    public void goToMyReviews() throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("my-reviews.fxml"));
+        Scene myReviewsScene = new Scene(fxmlLoader.load());
+        LogInController logInController = fxmlLoader.getController();
+        logInController.setApplication(this);
+        mainStage.setTitle("Course Review - My Reviews");
+        mainStage.setScene(myReviewsScene);
         mainStage.show();
     }
 }
