@@ -27,12 +27,12 @@
       <TextField fx:id="courseTitle" layoutX="175.0" layoutY="89.0" prefHeight="26.0" prefWidth="130.0" />
       <Button layoutX="325.0" layoutY="89.0" mnemonicParsing="false" onAction="#searchCourse" text="Search" />
       <Button layoutX="393.0" layoutY="89.0" mnemonicParsing="false" onAction="#registerCourse" text="Register" />
-      <Label fx:id="buttonMessage" alignment="CENTER" layoutX="325.0" layoutY="60.0" prefHeight="19.0" prefWidth="130.0">
+      <Label fx:id="buttonMessage" layoutX="325.0" layoutY="60.0" prefHeight="19.0" prefWidth="262.0">
          <font>
             <Font size="13.0" />
          </font>
       </Label>
-      <Button layoutX="455.0" layoutY="347.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="My Reviews" />
+      <Button layoutX="456.0" layoutY="347.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="80.0" text="My Reviews" />
       <ListView fx:id="courseList" layoutX="49.0" layoutY="128.0" prefHeight="246.0" prefWidth="402.0" />
    </children>
 </AnchorPane>

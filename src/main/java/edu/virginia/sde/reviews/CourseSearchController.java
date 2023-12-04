@@ -10,7 +10,9 @@ import javafx.stage.Stage;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
+import java.sql.Array;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -45,22 +47,93 @@ public class CourseSearchController implements Initializable {
         // TODO: Try to get this to be sorted by course number too
         return allCoursesSorted;
     }
+
+    public void displayCourse(Course course){
+        courseList.getItems().setAll(course);
+    }
+
+    public void displayCourses(List<Course> courses){
+        courseList.getItems().setAll(courses);
+    }
+
+    public void displayAllCourses() throws SQLException {
+        var allCourses = getAllCourses();
+        courseList.getItems().setAll(allCourses);
+    }
+
     public void searchCourse(ActionEvent event) throws SQLException {
         String subject = courseSubject.getText();
-        int number = Integer.parseInt(courseNumber.getText());
+        String number = courseNumber.getText();
         String title = courseTitle.getText();
-        if ((!subject.isEmpty() || !title.isEmpty() || !String.valueOf(number).isEmpty()) && !db.courseAlreadyExists(subject, number, title)){
-            // If all fields are filled and does not exist
+        if (subject.isEmpty() && title.isEmpty() && number.isEmpty()){
+            displayAllCourses();
+        }
+        if ((!subject.isEmpty() && !title.isEmpty() && !number.isEmpty()) && !db.courseAlreadyExists(subject, Integer.parseInt(number), title)){
+            // If all fields are filled and it does not exist
             handleButton("Course does not exist", red);
+            return;
         }
-        else if (!subject.isEmpty() || !title.isEmpty() || !String.valueOf(number).isEmpty()){
-
+        else if (!subject.isEmpty() && !title.isEmpty() && !number.isEmpty() && db.courseAlreadyExists(subject, Integer.parseInt(number), title)){
+            // If all the fields match an existing course
+            Course foundCourse = new Course(subject, Integer.parseInt(number), title);
+            displayCourse(foundCourse);
         }
-        else{
+        else{   // If there is at least one field filled
             // TODO: Implement searching for a course
-            db.getCoursesBySubject(subject);
-            db.getCoursesByNumber(number);
-            db.getCoursesByTitle(title);
+            if (!subject.isEmpty() && number.isEmpty() && title.isEmpty()){
+                displayCourses(db.getCoursesBySubject(subject));
+            }
+            else if (subject.isEmpty() && !number.isEmpty() && title.isEmpty()){
+                displayCourses(db.getCoursesByNumber(Integer.parseInt(number)));
+            }
+            else if (subject.isEmpty() && number.isEmpty() && !title.isEmpty()){
+                displayCourses(db.getCoursesByTitle(title));
+            }
+            else if(!subject.isEmpty() && !number.isEmpty() && title.isEmpty()){
+                List<Course> subjects = db.getCoursesBySubject(subject);
+                List<Course> numbers = db.getCoursesByNumber(Integer.parseInt(number));
+                ArrayList<Course> common = new ArrayList<>();
+                for (Course sub : subjects){    // O(n^2) time lol
+                    for (Course num : numbers){
+                        if (sub.getSubjectNmeumonic().equals(num.getSubjectNmeumonic()) && sub.getCourseNumber() == num.getCourseNumber()){
+                            if (!common.contains(sub)){ // Makes sure duplicates are not added
+                                common.add(sub);
+                            }
+                        }
+                    }
+                }
+                displayCourses(common);
+            }
+            else if (!subject.isEmpty() && number.isEmpty() && !title.isEmpty()){
+                List<Course> subjects = db.getCoursesBySubject(subject);
+                List<Course> titles = db.getCoursesByTitle(title);
+                ArrayList<Course> common = new ArrayList<>();
+                for (Course sub : subjects){
+                    for (Course tit : titles){
+                        if (sub.getSubjectNmeumonic().equals(tit.getSubjectNmeumonic()) && sub.getCourseTitle().equals(tit.getCourseTitle())){
+                            if (!common.contains(sub)){
+                                common.add(sub);
+                            }
+                        }
+                    }
+                }
+                displayCourses(common);
+            }
+            else if (subject.isEmpty() && !number.isEmpty() && !title.isEmpty()){
+                List<Course> numbers = db.getCoursesByNumber(Integer.parseInt(number));
+                List<Course> titles = db.getCoursesByTitle(title);
+                ArrayList<Course> common = new ArrayList<>();
+                for (Course num : numbers){
+                    for (Course tit : titles){
+                        if (num.getCourseNumber() == tit.getCourseNumber() && num.getCourseTitle().equals(tit.getCourseTitle())){
+                            if (!common.contains(num)){
+                                common.add(num);
+                            }
+                        }
+                    }
+                }
+                displayCourses(common);
+            }
         }
     }
 

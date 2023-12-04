@@ -12,21 +12,12 @@ public class CourseReview {
     private String comment;
     private Timestamp timestamp;
 
-    public CourseReview(int id, int courseID, int postingStudentID, int rating, String comment) {
-        this.id = id;
+    public CourseReview(int courseID, int postingStudentID, int rating, String comment) {
         this.courseID = courseID;
         this.postingStudentID = postingStudentID;
         this.rating = rating;
         this.comment = comment;
         this.timestamp = new Timestamp(System.currentTimeMillis());
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getCourseID() {

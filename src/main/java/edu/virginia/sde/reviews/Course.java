@@ -83,6 +83,6 @@ public class Course {
     public String toString() {
         DecimalFormat df = new DecimalFormat("0.00");
         double avgRating = getAvgRating();
-        return String.format("%s %d: %s \nAvg Rating: %s", subjectNmeumonic, courseNumber, courseTitle, df.format(avgRating));
+        return String.format("%s %d: %s \nAvg Rating: %s", subjectNmeumonic.toUpperCase(), courseNumber, courseTitle, df.format(avgRating));
     }
 }

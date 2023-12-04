@@ -122,30 +122,24 @@ public class DatabaseDriver {
 
     public List<Course> getAllCourses() throws SQLException {
         var courses = new ArrayList<Course>();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * from Courses");
-            ResultSet results = statement.executeQuery();
-            // Maybe try changing this to a for each loop
-            while (results.next()) {
-                String subject = results.getString("Subject");
-                int courseNumber = results.getInt("CourseNumber");
-                String title = results.getString("Title");
-                Course newCourse = new Course(subject, courseNumber, title);
-                courses.add(newCourse);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement statement = connection.prepareStatement("SELECT * from Courses");
+        ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            String subject = results.getString("Subject");
+            int courseNumber = results.getInt("CourseNumber");
+            String title = results.getString("Title");
+            Course newCourse = new Course(subject, courseNumber, title);
+            courses.add(newCourse);
         }
+        statement.close();
         return courses;
     }
 
-    public Optional<Course> getCourseById(int courseID) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
+    public Optional<Course> getCourseById(int courseID){
         try{
-            PreparedStatement statement = connection.prepareStatement(String.format("SELECT * from Courses where ID=%s", courseID));
+            PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where ID=%s");
             ResultSet results = statement.executeQuery();
-
+            statement.setInt(1, courseID);
             if (results.next()) {
                 String subject = results.getString("Subject");
                 int courseNumber = results.getInt("CourseNumber");
@@ -160,93 +154,73 @@ public class DatabaseDriver {
     }
 
     public int getCourseId(String subject, int number, String title) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-        try{
-            String preparedStatement = String.format("SELECT * from Courses where Subject=%s AND CourseNumber=%d AND Title=%s", subject, number, title);
-            PreparedStatement statement = connection.prepareStatement(preparedStatement);
-            ResultSet results = statement.executeQuery();
+        String preparedStatement = "SELECT * from Courses where Subject=? AND CourseNumber=? AND Title=?";
+        PreparedStatement statement = connection.prepareStatement(preparedStatement);
+        statement.setString(1, subject);
+        statement.setInt(2, number);
+        statement.setString(3, title);
+        ResultSet results = statement.executeQuery();
 
-            if (results.next()) {
-                int id = results.getInt("ID");
-                return id;
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (results.next()) {
+            int id = results.getInt("ID");
+            return id;
         }
-        throw new SQLException("No course with subject, number, and title found.");
+        statement.close();
+        return -1;  // Should never reach this. I hope lol
     }
 
-    public List<Course> getCoursesBySubject(String courseSubject) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
+    public List<Course> getCoursesBySubject(String courseSubject) throws SQLException {
         var courses = new ArrayList<Course>();
-        try{
-            String preparedStatment = String.format("SELECT * from Courses where Subject=%s", courseSubject);
-            PreparedStatement statement = connection.prepareStatement(preparedStatment);
-            ResultSet results = statement.executeQuery();
-            while (results.next()) {
-                int id = results.getInt("ID");
-                String subject = results.getString("Subject");
-                int courseNumber = results.getInt("CourseNumber");
-                String title = results.getString("Title");
-                var newCourse = new Course(subject, courseNumber, title);
-                courses.add(newCourse);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        String preparedStatement = "SELECT * from Courses where Subject=?";
+        PreparedStatement statement = connection.prepareStatement(preparedStatement);
+        statement.setString(1, courseSubject);
+        ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            String subject = results.getString("Subject");
+            int courseNumber = results.getInt("CourseNumber");
+            String title = results.getString("Title");
+            Course newCourse = new Course(subject, courseNumber, title);
+            courses.add(newCourse);
         }
+        statement.close();
         return courses;
     }
 
-    public List<Course> getCoursesByNumber(int courseNumber) throws SQLException{
+    public List<Course> getCoursesByNumber(int courseNumber) throws SQLException {
         var courses = new ArrayList<Course>();
-        try{
-            String preparedStatement = "SELECT * from Courses where CourseNumber=?";
-            PreparedStatement statement = connection.prepareStatement(preparedStatement);
-            statement.setInt(1, courseNumber);
-            ResultSet results = statement.executeQuery();
-            while (results.next()) {
-                int id = results.getInt("ID");
-                String subject = results.getString("Subject");
-                int number = results.getInt("CourseNumber");
-                String title = results.getString("Title");
-                var newCourse = new Course(subject, number, title);
-                courses.add(newCourse);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        String preparedStatement = "SELECT * from Courses where CourseNumber=?";
+        PreparedStatement statement = connection.prepareStatement(preparedStatement);
+        statement.setInt(1, courseNumber);
+        ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            String subject = results.getString("Subject");
+            int number = results.getInt("CourseNumber");
+            String title = results.getString("Title");
+            Course newCourse = new Course(subject, number, title);
+            courses.add(newCourse);
         }
+        statement.close();
         return courses;
     }
 
-    public List<Course> getCoursesByTitle(String subString) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
+    public List<Course> getCoursesByTitle(String subString) throws SQLException {
         var courses = new ArrayList<Course>();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where Title LIKE '%'||?||'%'");
-            statement.setString(1, subString);
-            ResultSet results = statement.executeQuery();
-            // Try changing this to a for each loop
-            while (results.next()) {
-                int id = results.getInt("ID");
-                String subject = results.getString("Subject");
-                int number = results.getInt("CourseNumber");
-                String title = results.getString("Title");
-                var newCourse = new Course(subject, number, title);
-                courses.add(newCourse);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where Title LIKE '%'||?||'%'");
+        statement.setString(1, subString);
+        ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            String subject = results.getString("Subject");
+            int number = results.getInt("CourseNumber");
+            String title = results.getString("Title");
+            Course newCourse = new Course(subject, number, title);
+            courses.add(newCourse);
         }
+        statement.close();
         return courses;
     }
 
     public void addStudent(Student student) throws SQLException{
         try {
-            if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
             String command = "INSERT INTO Students (Username, Password) VALUES (?,?)";
             PreparedStatement statement = connection.prepareStatement(command);
             statement.setString(1, student.getUsername());
@@ -259,7 +233,7 @@ public class DatabaseDriver {
         }
     }
 
-    public List<Student> getAllStudents() throws SQLException {
+    public List<Student> getAllStudents(){
         var students = new ArrayList<Student>();
         try{
             PreparedStatement statement = connection.prepareStatement("SELECT * from Students");
@@ -296,21 +270,16 @@ public class DatabaseDriver {
     }
 
     public int getStudentId(String username) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-        try{
-            String preparedStatement = String.format("SELECT * from Students where Username=%s", username);
-            PreparedStatement statement = connection.prepareStatement(preparedStatement);
-            ResultSet results = statement.executeQuery();
+        String preparedStatement = String.format("SELECT * from Students where Username=%s", username);
+        PreparedStatement statement = connection.prepareStatement(preparedStatement);
+        ResultSet results = statement.executeQuery();
 
-            if (results.next()) {
-                int id = results.getInt("ID");
-                return id;
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (results.next()) {
+            int id = results.getInt("ID");
+            return id;
         }
-        throw new SQLException("No student with username: " + username + "found.");
+        statement.close();
+        return -1;  // Should never reach this. I hope
     }
 
     public Optional<Student> getStudentById(int studentID) throws SQLException{
@@ -370,96 +339,21 @@ public class DatabaseDriver {
         return Optional.empty();
     }
 
-    public void addReview(CourseReview review) throws SQLException{
-        try {
-            if (connection.isClosed()) {
-                throw new IllegalStateException("Connection is not open");
-            }
-            String command = "INSERT INTO Reviews(StudentID, CourseID, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement statement = connection.prepareStatement(command);
-            statement.setInt(1, review.getPostingStudentID());
-            statement.setInt(2, review.getCourseID());
-            statement.setInt(3, review.getRating());
-            statement.setTimestamp(4, review.getTimestamp());
-            // Set Comment if it's not null, otherwise setNull to indicate a NULL value
-            if (review.getComment() != null) {
-                statement.setString(5, review.getComment());
-            } else {
-                statement.setNull(5, Types.VARCHAR);
-            }
-            statement.executeUpdate();
-            statement.close();
-        } catch (SQLException e) {
-            rollback();
-            throw e;
-        }
-    }
-
-    public void editReview(CourseReview oldReview, CourseReview newReview) throws SQLException{
-        if (connection.isClosed()) {
-            throw new IllegalStateException("Connection is not open");
-        }
-
-        try {
-            String updateQuery = "UPDATE Reviews SET Rating = ?, Timestamp = ?, Comment = ? WHERE CourseID = ? AND StudentID = ?";
-            PreparedStatement statement = connection.prepareStatement(updateQuery);
-            statement.setInt(1, newReview.getRating());
-            statement.setTimestamp(2, newReview.getTimestamp());
-            if (newReview.getComment() != null) {
-                statement.setString(3, newReview.getComment());
-            } else {
-                statement.setNull(3, Types.VARCHAR);
-            }
-            statement.setInt(4, oldReview.getCourseID());
-            statement.setInt(5, oldReview.getPostingStudentID());
-            int rowsAffected = statement.executeUpdate();
-            statement.close();
-            if (rowsAffected == 0) {
-                throw new SQLException("No review found for Course ID: " + oldReview.getCourseID() + " and Student ID: " + oldReview.getPostingStudentID());
-            }
-        } catch (SQLException e) {
-            rollback();
-            throw e;
-        }
-    }
-
-    public void removeReview(Course course, Student student) throws SQLException{
-        if (connection.isClosed()) {
-            throw new IllegalStateException("Connection is not open");
-        }
-        try {
-            String deleteQuery = "DELETE FROM Reviews WHERE CourseID = ? AND StudentID = ?";
-            PreparedStatement statement = connection.prepareStatement(deleteQuery);
-            statement.setInt(1, getCourseId(course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
-            statement.setInt(2, getStudentId(student.getUsername()));
-            int rowsAffected = statement.executeUpdate();
-            statement.close();
-            if (rowsAffected == 0) {
-                throw new SQLException("No review found for Course ID: " + course.getId() + " and Student ID: " + student.getId());
-            }
-        } catch (SQLException e) {
-            rollback();
-            throw e;
-        }
-    }
-
-    public List<CourseReview> getAllReviews() throws SQLException {
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
+    public List<CourseReview> getAllReviews(){
         var reviews = new ArrayList<CourseReview>();
         try{
             PreparedStatement statement = connection.prepareStatement("SELECT * from Reviews");
             ResultSet results = statement.executeQuery();
             while (results.next()) {
-                int id = results.getInt("ID");
                 int studentID = results.getInt("StudentID");
                 int courseid = results.getInt("CourseID");
-                int rating = results.getInt("Rating");
                 String comment = results.getString("Comment");
+                int rating = results.getInt("Rating");
                 Timestamp timestamp = results.getTimestamp("Timestamp");
                 if (results.wasNull()) {
                     comment = null;
                 }
-                var newReview = new CourseReview(id, courseid, studentID, rating, comment);
+                var newReview = new CourseReview(courseid, studentID, rating, comment);
                 newReview.setTimestamp(timestamp);  // Sets the new timestamp to have recorded timestamp
                 reviews.add(newReview);
             }
@@ -470,30 +364,20 @@ public class DatabaseDriver {
         return reviews;
     }
 
-    public Optional<CourseReview> getReviewById(int reviewID) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * from Reviews where ID=?");
-            statement.setInt(1, reviewID);
-            ResultSet results = statement.executeQuery();
-            if (results.next()) {
-                int id = results.getInt("ID");
-                int userid = results.getInt("StudentID");
-                int courseid = results.getInt("CourseID");
-                int rating = results.getInt("Rating");
-                String comment = results.getString("Comment");
-                Timestamp timestamp = results.getTimestamp("Timestamp");
-                if (results.wasNull()) {
-                    comment = null;
-                }
-                CourseReview newCR = new CourseReview(id, courseid, userid, rating, comment);
-                newCR.setTimestamp(timestamp);
-                return Optional.of(newCR);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public void addReview(CourseReview review) throws SQLException {
+        String command = "INSERT INTO Reviews(StudentID, CourseID, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(command);
+        statement.setInt(1, review.getPostingStudentID());
+        statement.setInt(2, review.getCourseID());
+        statement.setInt(3, review.getRating());
+        statement.setTimestamp(5, review.getTimestamp());
+        // Set Comment if it's not null, otherwise setNull to indicate a NULL value
+        if (review.getComment() != null) {
+            statement.setString(4, review.getComment());
+        } else {
+            statement.setNull(4, Types.VARCHAR);
         }
-        return Optional.empty();
+        statement.executeUpdate();
+        statement.close();
     }
 }
