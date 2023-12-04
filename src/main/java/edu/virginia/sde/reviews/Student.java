@@ -52,4 +52,8 @@ public class Student {  // Basically the user
     public void addReview(CourseReview review){
         this.reviews.add(review);
     }
+
+    public String toString(){
+        return getUsername();
+    }
 }

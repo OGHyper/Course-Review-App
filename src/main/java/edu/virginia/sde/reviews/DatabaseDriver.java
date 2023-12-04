@@ -78,12 +78,15 @@ public class DatabaseDriver {
             statement.executeUpdate(createStudentsTable);
             String createReviewsTable = "CREATE TABLE IF NOT EXISTS Reviews ("
                     + " ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + " StudentID INTEGER NOT NULL,"
+                    + " StudentName VARCHAR(255) NOT NULL,"
                     + " CourseID INTEGER NOT NULL,"
+                    + " CourseSubject VARCHAR(255) NOT NULL,"
+                    + " CourseNumber INTEGER NOT NULL,"
+                    + " CourseTitle VARCHAR (255) NOT NULL,"
                     + " Rating INTEGER NOT NULL,"
                     + "	Comment VARCHAR(255),"
                     + " Timestamp TIMESTAMP NOT NULL,"
-                    + " FOREIGN KEY (StudentID) REFERENCES Students(ID) ON DELETE CASCADE,"
+                    + " FOREIGN KEY (StudentName) REFERENCES Students(Username) ON DELETE CASCADE,"
                     + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE);";
             statement.executeUpdate(createReviewsTable);
         } catch (SQLException e) {
@@ -341,15 +344,18 @@ public class DatabaseDriver {
             PreparedStatement statement = connection.prepareStatement("SELECT * from Reviews");
             ResultSet results = statement.executeQuery();
             while (results.next()) {
-                int studentID = results.getInt("StudentID");
-                int courseid = results.getInt("CourseID");
+                String studentName = results.getString("StudentName");
+                int courseID = results.getInt("CourseID");
+                String courseSubject = results.getString("CourseSubject");
+                int courseNumber = results.getInt("CourseNumber");
+                String courseTitle = results.getString("CourseTitle");
                 String comment = results.getString("Comment");
                 int rating = results.getInt("Rating");
                 Timestamp timestamp = results.getTimestamp("Timestamp");
                 if (results.wasNull()) {
                     comment = null;
                 }
-                var newReview = new CourseReview(courseid, studentID, rating, comment, timestamp);
+                var newReview = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
                 newReview.setTimestamp(timestamp);  // Sets the new timestamp to have recorded timestamp
                 reviews.add(newReview);
             }
@@ -361,38 +367,107 @@ public class DatabaseDriver {
     }
 
     public void addReview(CourseReview review) throws SQLException {
-        String command = "INSERT INTO Reviews(StudentID, CourseID, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?)";
+        String command = "INSERT INTO Reviews(StudentName, CourseID, CourseSubject, CourseNumber, CourseTitle, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(command);
-        statement.setInt(1, review.getPostingStudentID());
+        statement.setString(1, review.getPostingStudentName());
         statement.setInt(2, review.getCourseID());
-        statement.setInt(3, review.getRating());
-        statement.setTimestamp(5, review.getTimestamp());
-        // Set Comment if it's not null, otherwise setNull to indicate a NULL value
+        statement.setString(3, review.getCourseSubject());
+        statement.setInt(4, review.getCourseNumber());
+        statement.setString(5, review.getCourseTitle());
+        statement.setInt(6, review.getRating());
         if (review.getComment() != null) {
-            statement.setString(4, review.getComment());
+            statement.setString(7, review.getComment());
         } else {
-            statement.setNull(4, Types.VARCHAR);
+            statement.setNull(7, Types.VARCHAR);
         }
+        statement.setTimestamp(8, review.getTimestamp());
         statement.executeUpdate();
         statement.close();
     }
 
     public List<CourseReview> getReviewsFromStudent(Student student) throws SQLException {
         var reviews = new ArrayList<CourseReview>();
-        String command = "SELECT * FROM Reviews WHERE StudentID = ?";
+        String command = "SELECT * FROM Reviews WHERE StudentName = ?";
         PreparedStatement statement = connection.prepareStatement(command);
-        statement.setInt(1, getStudentId(student.getUsername()));
+        statement.setString(1, student.getUsername());
         ResultSet results = statement.executeQuery();
         while(results.next()){
             int courseID = results.getInt("CourseID");
-            int studentID = results.getInt("StudentID");
+            String courseSubject = results.getString("CourseSubject");
+            int courseNumber = results.getInt("CourseNumber");
+            String courseTitle = results.getString("CourseTitle");
+            String studentName = results.getString("StudentName");
             int rating = results.getInt("Rating");
             String comment = results.getString("Comment");
             Timestamp timestamp = results.getTimestamp("Timestamp");
-            CourseReview review = new CourseReview(courseID, studentID, rating, comment, timestamp);
+            CourseReview review = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
             reviews.add(review);
         }
         statement.close();
         return reviews;
+    }
+
+    public List<CourseReview> getReviewsFromCourse(Course course) throws SQLException {
+        var reviews = new ArrayList<CourseReview>();
+        String command = "SELECT * FROM Reviews WHERE CourseID = ?";
+        PreparedStatement statement = connection.prepareStatement(command);
+        statement.setInt(1, course.getId());
+        ResultSet results = statement.executeQuery();
+        while (results.next()){
+            int courseID = results.getInt("CourseID");
+            String courseSubject = results.getString("CourseSubject");
+            int courseNumber = results.getInt("CourseNumber");
+            String courseTitle = results.getString("CourseTitle");
+            String studentName = results.getString("StudentName");
+            int rating = results.getInt("Rating");
+            String comment = results.getString("Comment");
+            Timestamp timestamp = results.getTimestamp("Timestamp");
+            CourseReview review = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
+            reviews.add(review);
+        }
+        statement.close();
+        return reviews;
+    }
+
+    public CourseReview getReviewOfCourseFromStudent(Course course, Student student) throws SQLException {
+        CourseReview review = null;
+        String query = "SELECT * FROM Reviews WHERE StudentName = ? AND CourseID = ?";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, student.getUsername());
+        statement.setInt(2, getCourseId(course.getSubjectNmeumonic(),course.getCourseNumber(),course.getCourseTitle()));
+        ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            int courseID = results.getInt("CourseID");
+            String courseSubject = results.getString("CourseSubject");
+            int courseNumber = results.getInt("CourseNumber");
+            String courseTitle = results.getString("CourseTitle");
+            String studentName = results.getString("StudentName");
+            int rating = results.getInt("Rating");
+            String comment = results.getString("Comment");
+            Timestamp timestamp = results.getTimestamp("Timestamp");
+            if (results.wasNull()) {
+                comment = null;
+            }
+            review = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
+        }
+        statement.close();
+        return review;
+    }
+
+    public void updateReview (CourseReview newReview) throws SQLException {
+        String updateQuery = "UPDATE Reviews SET Rating = ?, Comment = ?, Timestamp = ? WHERE CourseID = ? AND StudentName = ?";
+        PreparedStatement statement = connection.prepareStatement(updateQuery);
+        statement.setInt(1, newReview.getRating());
+        if (newReview.getComment() != null) {
+            statement.setString(2, newReview.getComment());
+        } else {
+            statement.setNull(2, Types.VARCHAR);
+        }
+        statement.setTimestamp(3, newReview.getTimestamp());
+        // New review should be updating the old review, so courseID and posting student name is the same
+        statement.setInt(4, newReview.getCourseID());
+        statement.setString(5, newReview.getPostingStudentName());
+        statement.executeUpdate();
+        statement.close();
     }
 }

@@ -8,7 +8,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.virginia.sde.reviews.MyReviewsController">
    <children>
-      <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="59.0" text="Back">
+      <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#goToCourseSearch" prefHeight="38.0" prefWidth="59.0" text="Back">
          <font>
             <Font size="14.0" />
          </font>
@@ -18,6 +18,6 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <ListView fx:id="myReviews" layoutX="73.0" layoutY="123.0" prefHeight="200.0" prefWidth="200.0" />
+      <ListView fx:id="myReviews" layoutX="14.0" layoutY="58.0" prefHeight="328.0" prefWidth="334.0" />
    </children>
 </AnchorPane>

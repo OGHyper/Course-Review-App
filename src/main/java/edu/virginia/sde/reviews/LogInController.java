@@ -79,6 +79,8 @@ public class LogInController {
         if (db.studentExists(username)) {    // Check if the user is in the database, then sign in and switch scenes
             if (db.getPasswordForStudent(signInStudent).equals(Optional.of(password))){
                 //handleButton("*goes to course search*", green);
+                //System.out.println(signInStudent + " logs in");
+                application.setLoggedInStudent(signInStudent);
                 application.switchToCourseSearch(signInStudent);
             }
             else{

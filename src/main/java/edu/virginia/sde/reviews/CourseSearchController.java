@@ -9,10 +9,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.control.TextField;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 
 public class CourseSearchController implements Initializable {
@@ -172,7 +169,8 @@ public class CourseSearchController implements Initializable {
     }
 
     public void goToMyReviews(ActionEvent event) throws Exception {
-        application.goToMyReviews(loggedInStudent);
+        //System.out.println(this.loggedInStudent + " going to my reviews");
+        application.goToMyReviews(this.loggedInStudent);
     }
 
     public void goToCourseReviews(ActionEvent event){
@@ -183,12 +181,12 @@ public class CourseSearchController implements Initializable {
         this.application = application;
     }
 
-    public void setDatabaseDriver(DatabaseDriver dbDriver){
-        //this.db = dbDriver;
-    }
-
     public void setLoggedInStudent(Student loggedInStudent) {
         this.loggedInStudent = loggedInStudent;
+    }
+
+    public Student getLoggedInStudent(){
+        return this.loggedInStudent;
     }
 
     public void handleButton(String message, Paint color) {
