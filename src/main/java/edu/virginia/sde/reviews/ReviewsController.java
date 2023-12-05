@@ -2,10 +2,7 @@ package edu.virginia.sde.reviews;
 
 import javafx.fxml.FXML;
 
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Paint;
 
 import java.util.*;
@@ -34,7 +31,7 @@ public class ReviewsController {
     @FXML
     private ChoiceBox<Integer> ratingChoice;
     @FXML
-    private TextField newComment;
+    private TextArea newComment;
     @FXML
     private Label buttonMessage;
     @FXML

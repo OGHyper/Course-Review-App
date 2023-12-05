@@ -4,7 +4,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -30,14 +30,15 @@
       <Label fx:id="studentRating" layoutX="286.0" layoutY="60.0" text="Rating: " />
       <Label layoutX="286.0" layoutY="78.0" text="Comment: " />
       <Label fx:id="studentComment" alignment="TOP_LEFT" layoutX="344.0" layoutY="78.0" prefHeight="82.0" prefWidth="242.0" wrapText="true" />
-      <Label layoutX="286.0" layoutY="160.0" text="Post or update your review:" />
-      <Label fx:id="studentRating1" layoutX="286.0" layoutY="182.0" text="Rating: " />
-      <Label layoutX="286.0" layoutY="210.0" text="Comment: " />
-      <ChoiceBox fx:id="ratingChoice" layoutX="343.0" layoutY="177.0" prefHeight="26.0" prefWidth="30.0" />
-      <TextField fx:id="newComment" alignment="TOP_LEFT" layoutX="343.0" layoutY="215.0" prefHeight="125.0" prefWidth="242.0" />
+      <Label layoutX="284.0" layoutY="172.0" text="Post or update your review:" />
+      <Label fx:id="studentRating1" layoutX="284.0" layoutY="194.0" text="Rating: " />
+      <Label layoutX="284.0" layoutY="222.0" text="Comment: " />
+      <ChoiceBox fx:id="ratingChoice" layoutX="341.0" layoutY="189.0" prefHeight="26.0" prefWidth="30.0" />
       <Button layoutX="545.0" layoutY="341.0" mnemonicParsing="false" onAction="#postStudentReview" text="Post" />
       <Label fx:id="buttonMessage" alignment="CENTER_RIGHT" layoutX="283.0" layoutY="367.0" prefHeight="18.0" prefWidth="303.0" />
       <Button layoutX="496.0" layoutY="37.0" mnemonicParsing="false" onAction="#deleteStudentReview" text="Delete review" />
       <Label fx:id="reviewDeletedMsg" layoutX="496.0" layoutY="14.0" prefHeight="18.0" prefWidth="88.0" />
+      <Label fx:id="avgRatingMsg" layoutX="96.0" layoutY="41.0" text="Avg Rating: " />
+      <TextArea fx:id="newComment" layoutX="343.0" layoutY="227.0" prefHeight="114.0" prefWidth="242.0" wrapText="true" />
    </children>
 </AnchorPane>

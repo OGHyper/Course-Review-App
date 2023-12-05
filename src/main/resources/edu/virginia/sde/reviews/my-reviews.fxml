@@ -19,5 +19,7 @@
          </font>
       </Label>
       <ListView fx:id="myReviews" layoutX="14.0" layoutY="58.0" prefHeight="328.0" prefWidth="334.0" />
+      <Button layoutX="363.0" layoutY="58.0" mnemonicParsing="false" onAction="#selectCourse" prefHeight="54.0" prefWidth="222.0" text="Go to Review" />
+      <Label fx:id="buttonMessage" alignment="CENTER" layoutX="363.0" layoutY="126.0" prefHeight="18.0" prefWidth="222.0" />
    </children>
 </AnchorPane>
