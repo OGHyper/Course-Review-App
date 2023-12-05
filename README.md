@@ -6,7 +6,7 @@
 
 ## To Run
 
-[Add a brief description of which .java file to run, and what vm arguments are needed]
+Run 'CourseReviewsApplication.java' with the vm argument '--module-path [PATH_TO_JAVAFX_LIB_FOLDER] --add-modules javafx.controls,javafx.fxml'
 
 ## Contributions
 
