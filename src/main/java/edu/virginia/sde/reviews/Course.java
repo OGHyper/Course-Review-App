@@ -65,7 +65,7 @@ public class Course {
     public String toString() {
         double avgRating = getAvgRating();
         String formattedRatingAvg = df.format(avgRating);
-        if (formattedRatingAvg.isEmpty()){
+        if (formattedRatingAvg.equals("NaN")){
             formattedRatingAvg = "";
         }
         return String.format("%s %d: %s \nAvg Rating: %s", subjectNmeumonic.toUpperCase(), courseNumber, courseTitle, formattedRatingAvg);

@@ -136,6 +136,9 @@ public class ReviewsController {
             total += review.getRating();
         }
         double avg = total*1.0 / allReviews.size();
+        if (df.format(avg).equals("NaN")){
+            return "";
+        }
         return df.format(avg);
     }
 }
