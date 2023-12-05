@@ -7,8 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Paint;
 import javafx.scene.control.TextField;
-
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -74,7 +72,6 @@ public class CourseSearchController implements Initializable {
             displayCourse(foundCourse);
         }
         else{   // If there is at least one field filled
-            // TODO: Implement searching for a course
             if (!subject.isEmpty() && number.isEmpty() && title.isEmpty()){
                 displayCourses(db.getCoursesBySubject(subject));
             }
@@ -183,10 +180,6 @@ public class CourseSearchController implements Initializable {
 
     public void setLoggedInStudent(Student loggedInStudent) {
         this.loggedInStudent = loggedInStudent;
-    }
-
-    public Student getLoggedInStudent(){
-        return this.loggedInStudent;
     }
 
     public void handleButton(String message, Paint color) {

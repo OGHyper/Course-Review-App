@@ -1,7 +1,6 @@
 package edu.virginia.sde.reviews;
 
 import java.sql.*;
-import java.text.DecimalFormat;
 import java.util.*;
 
 public class DatabaseDriver {
@@ -95,7 +94,6 @@ public class DatabaseDriver {
         }
     }
 
-    // Insert Database functions here
     public void addCourse(Course course) throws SQLException {
         String command = "INSERT INTO Courses(ID,Subject,CourseNumber,Title) VALUES(null,?,?,?)";
         PreparedStatement statement = connection.prepareStatement(command);
@@ -168,6 +166,7 @@ public class DatabaseDriver {
             int courseNumber = results.getInt("CourseNumber");
             String title = results.getString("Title");
             Course newCourse = new Course(subject, courseNumber, title);
+            newCourse.setAvgRating(getAvgRatingOfCourse(newCourse));
             courses.add(newCourse);
         }
         statement.close();
@@ -185,6 +184,7 @@ public class DatabaseDriver {
             int number = results.getInt("CourseNumber");
             String title = results.getString("Title");
             Course newCourse = new Course(subject, number, title);
+            newCourse.setAvgRating(getAvgRatingOfCourse(newCourse));
             courses.add(newCourse);
         }
         statement.close();
@@ -201,6 +201,7 @@ public class DatabaseDriver {
             int number = results.getInt("CourseNumber");
             String title = results.getString("Title");
             Course newCourse = new Course(subject, number, title);
+            newCourse.setAvgRating(getAvgRatingOfCourse(newCourse));
             courses.add(newCourse);
         }
         statement.close();
