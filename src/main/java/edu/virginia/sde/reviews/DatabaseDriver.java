@@ -1,6 +1,7 @@
 package edu.virginia.sde.reviews;
 
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class DatabaseDriver {
@@ -133,6 +134,8 @@ public class DatabaseDriver {
             int courseNumber = results.getInt("CourseNumber");
             String title = results.getString("Title");
             Course newCourse = new Course(subject, courseNumber, title);
+            // TODO: Maybe put a cheeky function to set the newCourse's avg rating?
+            newCourse.setAvgRating(getAvgRatingOfCourse(newCourse));
             courses.add(newCourse);
         }
         statement.close();
@@ -217,6 +220,16 @@ public class DatabaseDriver {
         }
         statement.close();
         return courses;
+    }
+
+    // TODO: Implement a function to get the avg rating of a course
+    public Double getAvgRatingOfCourse(Course course) throws SQLException {
+        var coursesReviews = getReviewsFromCourse(course);
+        int total = 0;
+        for (CourseReview review : coursesReviews){
+            total += review.getRating();
+        }
+        return total*1.0 / coursesReviews.size();
     }
 
     public void addStudent(Student student) throws SQLException{
@@ -304,7 +317,7 @@ public class DatabaseDriver {
     public Optional<Student> getStudentByUsername(String username) throws SQLException{
         if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
         try{
-            String preparedStatement = "SELECT * from Students where username=%s";
+            String preparedStatement = "SELECT * from Students where username=?";
             PreparedStatement statement = connection.prepareStatement(preparedStatement);
             statement.setString(1, username);
             ResultSet results = statement.executeQuery();

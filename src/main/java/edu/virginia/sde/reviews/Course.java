@@ -7,11 +7,12 @@ import java.util.List;
 import static java.lang.Math.round;
 
 public class Course {
+    private static final DecimalFormat df = new DecimalFormat("0.00");
     private int id;
     private String subjectNmeumonic;
     private int courseNumber;
     private String courseTitle;
-    private List<CourseReview> reviews = new ArrayList<>();
+    private Double avgRating;
 
 
     public Course(String subjectNmeumonic, int courseNumber, String courseTitle) {
@@ -52,37 +53,21 @@ public class Course {
         this.courseTitle = courseTitle;
     }
 
-    public List<CourseReview> getReviews() {
-        return reviews;
+    public void setAvgRating(Double avgRating){
+        this.avgRating = avgRating;
     }
 
-    public void setReviews(List<CourseReview> reviews) {
-        this.reviews = reviews;
-    }
-
-    public void addReview(CourseReview review){
-        reviews.add(review);
-    }
-
-    public double getAvgRating(){
-        if (this.reviews.isEmpty()){
-            return 0.0;
-        }
-        else{
-            double total = 0.00;
-            for (CourseReview cr : this.reviews){
-                total += cr.getRating();
-            }
-            double avg = total / this.reviews.size();
-            avg = Math.round(avg * 100.0) / 100.0;
-            return avg;
-        }
+    public Double getAvgRating(){
+        return  this.avgRating;
     }
 
     @Override
     public String toString() {
-        DecimalFormat df = new DecimalFormat("0.00");
         double avgRating = getAvgRating();
-        return String.format("%s %d: %s \nAvg Rating: %s", subjectNmeumonic.toUpperCase(), courseNumber, courseTitle, df.format(avgRating));
+        String formattedRatingAvg = df.format(avgRating);
+        if (formattedRatingAvg.isEmpty()){
+            formattedRatingAvg = "";
+        }
+        return String.format("%s %d: %s \nAvg Rating: %s", subjectNmeumonic.toUpperCase(), courseNumber, courseTitle, formattedRatingAvg);
     }
 }
