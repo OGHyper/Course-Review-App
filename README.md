@@ -25,4 +25,3 @@ List the primary contributions of each author. It is recommended to update this 
 ## Issues
 
 List any known issues (bugs, incorrect behavior, etc.) at the time of submission.
-* New courses with no reviews will show 'NaN' as the average review score instead of remaining blank. Not sure why though I've tried many different possible solutions.
