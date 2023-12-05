@@ -5,9 +5,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.paint.Paint;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.sql.*;
 public class ReviewsController {
+    private static final DecimalFormat df = new DecimalFormat("0.00");
     private final Paint red = Paint.valueOf("b12525");
 
     private final Paint green = Paint.valueOf("#37e127");
@@ -41,7 +43,7 @@ public class ReviewsController {
         courseName.setText(String.format("Reviews for %s %d: %s", course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
         reviewsForCourse.getItems().setAll(getReviewsForCourse(this.course));
         ratingChoice.getItems().addAll(ratingValues);
-
+        avgRatingMsg.setText("Avg. Rating: " + getAvgRating());
         showStudentReview();
     }
 
@@ -102,6 +104,7 @@ public class ReviewsController {
     public void updateReviewList() throws SQLException {
         reviewsForCourse.getItems().setAll(getReviewsForCourse(this.course));
         //TODO: Have it update the average rating
+        avgRatingMsg.setText("Avg. Rating: " + getAvgRating());
     }
 
     public void deleteStudentReview() throws SQLException {
@@ -124,5 +127,15 @@ public class ReviewsController {
     public void handleButton(String message, Paint color) {
         buttonMessage.setTextFill(color);
         buttonMessage.setText(message);
+    }
+
+    public String getAvgRating() throws SQLException {
+        var allReviews = db.getReviewsFromCourse(course);
+        int total = 0;
+        for (CourseReview review : allReviews){
+            total += review.getRating();
+        }
+        double avg = total*1.0 / allReviews.size();
+        return df.format(avg);
     }
 }

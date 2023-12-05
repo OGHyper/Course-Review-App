@@ -87,7 +87,7 @@ public class CourseReview {
 
     public String toString(){
         //TODO: Implement this
-        return String.format("%s %d: %s\nAnon: %d\nComment: %s\nLast edited: %s", getCourseSubject(),
+        return String.format("%s %d: %s\nRating: %d\nComment: %s\nLast edited: %s", getCourseSubject(),
                 getCourseNumber(), getCourseTitle(),
                 getRating(), getComment(), getTimestamp().toString());
     }

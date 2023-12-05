@@ -366,7 +366,7 @@ public class DatabaseDriver {
     public void addReview(CourseReview review) throws SQLException {
         String command = "INSERT INTO Reviews(StudentID, StudentName, CourseID, CourseSubject, CourseNumber, CourseTitle, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(command);
-        System.out.println(review.getStudentID());
+        //System.out.println(review.getStudentID());
         statement.setInt(1, getStudentId(review.getPostingStudentName()));
         statement.setString(2, review.getPostingStudentName());
         statement.setInt(3, getCourseId(review.getCourseSubject(), review.getCourseNumber(), review.getCourseTitle()));
@@ -455,6 +455,8 @@ public class DatabaseDriver {
         statement.close();
         return review;
     }
+
+
 
     public void updateReview (CourseReview newReview) throws SQLException {
         String updateQuery = "UPDATE Reviews SET Rating = ?, Comment = ?, Timestamp = ? WHERE CourseID = ? AND StudentID = ?";
