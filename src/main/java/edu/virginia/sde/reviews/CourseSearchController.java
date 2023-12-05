@@ -55,7 +55,7 @@ public class CourseSearchController implements Initializable {
     }
 
     public void searchCourse(ActionEvent event) throws SQLException {
-        String subject = courseSubject.getText();
+        String subject = courseSubject.getText().toUpperCase();
         String number = courseNumber.getText();
         String title = courseTitle.getText();
         if (subject.isEmpty() && title.isEmpty() && number.isEmpty()){
@@ -130,7 +130,7 @@ public class CourseSearchController implements Initializable {
     }
 
     public void registerCourse(ActionEvent event) throws SQLException {
-        String subject = courseSubject.getText();
+        String subject = courseSubject.getText().toUpperCase();
         String title = courseTitle.getText();
         int number = 0; // This should be changed under all circumstances
         if (subject.isEmpty() || courseNumber.getText().isEmpty() || title.isEmpty()){
@@ -144,7 +144,10 @@ public class CourseSearchController implements Initializable {
             handleButton("Invalid course number", red);
             return;
         }
-        if (subject.length() < 2 || subject.length() > 4){
+        if (!subject.matches("^[A-Z]*$")){
+            handleButton("Subject MUST be only letters", red);
+        }
+        else if (subject.length() < 2 || subject.length() > 4){
             handleButton("Subject MUST be 2-4 characters long", red);
         }
         else if (courseNumber.getText().length() != 4){
