@@ -134,26 +134,11 @@ public class DatabaseDriver {
             int courseNumber = results.getInt("CourseNumber");
             String title = results.getString("Title");
             Course newCourse = new Course(subject, courseNumber, title);
-            // TODO: Maybe put a cheeky function to set the newCourse's avg rating?
             newCourse.setAvgRating(getAvgRatingOfCourse(newCourse));
             courses.add(newCourse);
         }
         statement.close();
         return courses;
-    }
-
-    public Optional<Course> getCourseById(int courseID) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where ID=%s");
-        ResultSet results = statement.executeQuery();
-        statement.setInt(1, courseID);
-        if (results.next()) {
-            String subject = results.getString("Subject");
-            int courseNumber = results.getInt("CourseNumber");
-            String title = results.getString("Title");
-            return Optional.of(new Course(subject, courseNumber, title));
-        }
-        statement.close();
-        return Optional.empty();    // Should never reach this
     }
 
     public int getCourseId(String subject, int number, String title) throws SQLException{
@@ -222,7 +207,6 @@ public class DatabaseDriver {
         return courses;
     }
 
-    // TODO: Implement a function to get the avg rating of a course
     public Double getAvgRatingOfCourse(Course course) throws SQLException {
         var coursesReviews = getReviewsFromCourse(course);
         int total = 0;
@@ -246,24 +230,6 @@ public class DatabaseDriver {
         }
     }
 
-    public List<Student> getAllStudents(){
-        var students = new ArrayList<Student>();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * from Students");
-            ResultSet results = statement.executeQuery();
-            while (results.next()) {
-                int id = results.getInt("ID");
-                String username = results.getString("Username");
-                String password = results.getString("Password");
-                var newStudent = new Student(username, password);
-                students.add(newStudent);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return students;
-    }
 
     public boolean studentExists(String username){
         boolean exists = false;
@@ -295,45 +261,6 @@ public class DatabaseDriver {
         return -1;  // Should never reach this. I hope
     }
 
-    public Optional<Student> getStudentById(int studentID) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-        try{
-            String preparedStatement = String.format("SELECT * from Students where ID=%d", studentID);
-            PreparedStatement statement = connection.prepareStatement(preparedStatement);
-            ResultSet results = statement.executeQuery();
-            if (results.next()) {
-                int id = results.getInt("ID");
-                String username = results.getString("Username");
-                String password = results.getString("Password");
-                return Optional.of(new Student(username, password));
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<Student> getStudentByUsername(String username) throws SQLException{
-        if (connection.isClosed()) throw new IllegalStateException("Connection is not open");
-        try{
-            String preparedStatement = "SELECT * from Students where username=?";
-            PreparedStatement statement = connection.prepareStatement(preparedStatement);
-            statement.setString(1, username);
-            ResultSet results = statement.executeQuery();
-            if (results.next()) {
-                int id = results.getInt("ID");
-                String username2 = results.getString("Username");
-                String password = results.getString("Password");
-                return Optional.of(new Student(username2, password));
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return Optional.empty();
-    }
-
     public Optional<String> getPasswordForStudent(Student student) throws SQLException{
         String preparedStatement = "SELECT * from Students where Username=?";
         PreparedStatement statement = connection.prepareStatement(preparedStatement);
@@ -345,35 +272,6 @@ public class DatabaseDriver {
         }
         statement.close();
         return Optional.empty();
-    }
-
-    public List<CourseReview> getAllReviews(){
-        var reviews = new ArrayList<CourseReview>();
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * from Reviews");
-            ResultSet results = statement.executeQuery();
-            while (results.next()) {
-                String studentName = results.getString("StudentName");
-                int studentID = getStudentId(studentName);
-                String courseSubject = results.getString("CourseSubject");
-                int courseNumber = results.getInt("CourseNumber");
-                String courseTitle = results.getString("CourseTitle");
-                int courseID = getCourseId(courseSubject, courseNumber, courseTitle);
-                String comment = results.getString("Comment");
-                int rating = results.getInt("Rating");
-                Timestamp timestamp = results.getTimestamp("Timestamp");
-                if (results.wasNull()) {
-                    comment = null;
-                }
-                var newReview = new CourseReview(studentID, studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
-                newReview.setTimestamp(timestamp);  // Sets the new timestamp to have recorded timestamp
-                reviews.add(newReview);
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return reviews;
     }
 
     public void addReview(CourseReview review) throws SQLException {
