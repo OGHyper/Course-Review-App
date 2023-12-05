@@ -43,15 +43,21 @@ public class LogInController {
         String password = passwordField.getText();
         if (username.isEmpty()){
             handleButton("Username cannot be empty", red);
+            return;
         }
         else if (password.isEmpty()){
             handleButton("Password cannot be empty", red);
+            return;
+        }
+        else if (password.length() < 8){
+            handleButton("Password must be >= 8 characters long", red);
+            return;
         }
         if (db.studentExists(username)){ // Need to check if the user is already registered.
             handleButton("User already exists!", red);
         }
         else if (!db.studentExists(username)){ // If not, create new student in the database then display success message
-            //Student newStudent = new Student(username.getText(), password.getText());
+            Student newStudent = new Student(username, password);
             try {
                 db.addStudent(new Student(username, password));
                 handleButton("User successfully created!", green);

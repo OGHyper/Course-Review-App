@@ -30,46 +30,90 @@ public class ReviewsController {
     @FXML
     private Label studentComment;
     @FXML
+    private Label reviewDeletedMsg;
+    @FXML
     private ChoiceBox<Integer> ratingChoice;
     @FXML
     private TextField newComment;
     @FXML
     private Label buttonMessage;
+    @FXML
+    private Label avgRatingMsg;
 
     public void setScene() throws SQLException {
-        reviewsForCourse.getItems().addAll(getReviewsForCourse(this.course));
         courseName.setText(String.format("Reviews for %s %d: %s", course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
+        reviewsForCourse.getItems().setAll(getReviewsForCourse(this.course));
         ratingChoice.getItems().addAll(ratingValues);
+
+        showStudentReview();
     }
 
     public void setApplication(CourseReviewsApplication application){
         this.application = application;
     }
 
+    public void setLoggedInStudent(Student student){
+        this.loggedInStudent = student;
+    }
+
+    public void setCourse(Course course){
+        this.course = course;
+    }
+
     public void postStudentReview() throws SQLException {
-        // TODO: Should take all the inputs and return a new CourseReview object
+        if (ratingChoice.getValue() == null){
+            handleButton("Rating cannot be empty", red);
+            return;
+        }
         int rating = ratingChoice.getValue();
         String comment = newComment.getText();
         if (comment.isEmpty()){
             comment = "No comment";
         }
-        CourseReview inputtedReview = new CourseReview(loggedInStudent.getUsername(), course.getId(), course.getSubjectNmeumonic(),
+        int courseID = db.getCourseId(course.getCourseTitle(), course.getCourseNumber(), course.getCourseTitle());
+        CourseReview inputtedReview = new CourseReview(db.getStudentId(loggedInStudent.getUsername()), loggedInStudent.getUsername(), courseID, course.getSubjectNmeumonic(),
                 course.getCourseNumber(), course.getCourseTitle(), rating, comment, new Timestamp(System.currentTimeMillis()));
-        if (db.getReviewsFromStudent(loggedInStudent).contains(inputtedReview)){
+        CourseReview existingReview = db.getReviewOfCourseFromStudent(course, loggedInStudent);
+        if (existingReview != null && existingReview.getCourseSubject().equals(inputtedReview.getCourseSubject()) && existingReview.getCourseNumber() == inputtedReview.getCourseNumber() && existingReview.getCourseTitle().equals(inputtedReview.getCourseTitle()) && existingReview.getPostingStudentName().equals(inputtedReview.getPostingStudentName())){
             updateStudentReview(inputtedReview);
         }
         else {
             db.addReview(inputtedReview);
+            updateReviewList();
+            this.studentRating.setText(String.format("Rating: %d", inputtedReview.getRating()));
+            this.studentComment.setText(inputtedReview.getComment());
             handleButton("Review posted", green);
         }
     }
 
     public void updateStudentReview(CourseReview review) throws SQLException {
-        // TODO: should update the student's review with the new one
         db.updateReview(review);
         this.studentRating.setText(String.format("Rating: %d", review.getRating()));
         this.studentComment.setText(review.getComment());
+        updateReviewList();
         handleButton("Review updated", green);
+    }
+
+    public void showStudentReview() throws SQLException {
+        CourseReview studentReview = db.getReviewOfCourseFromStudent(course, loggedInStudent);
+        if (studentReview != null){
+            studentRating.setText("Rating: " + studentReview.getRating());
+            studentComment.setText(studentReview.getComment());
+        }
+    }
+
+    public void updateReviewList() throws SQLException {
+        reviewsForCourse.getItems().setAll(getReviewsForCourse(this.course));
+        //TODO: Have it update the average rating
+    }
+
+    public void deleteStudentReview() throws SQLException {
+        db.deleteStudentReview(course, loggedInStudent);
+        updateReviewList();
+        studentRating.setText("Rating: ");
+        studentComment.setText("");
+        this.reviewDeletedMsg.setTextFill(green);
+        this.reviewDeletedMsg.setText("Review deleted");
     }
 
     public List<CourseReview> getReviewsForCourse(Course course) throws SQLException {

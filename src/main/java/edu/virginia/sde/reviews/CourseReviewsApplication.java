@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class CourseReviewsApplication extends Application {
@@ -68,6 +69,19 @@ public class CourseReviewsApplication extends Application {
         //System.out.println(myReviewsController.getLoggedInStudent() + " is in my reviews");
         mainStage.setTitle("Course Review - My Reviews");
         mainStage.setScene(myReviewsScene);
+        mainStage.show();
+    }
+
+    public void goToCourseReviews(Course course, Student student) throws Exception {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("reviews.fxml"));
+        Scene courseReviewsScene = new Scene(fxmlLoader.load());
+        ReviewsController crController = fxmlLoader.getController();
+        crController.setApplication(this);
+        crController.setLoggedInStudent(student);
+        crController.setCourse(course);
+        crController.setScene();
+        mainStage.setTitle("Course Review - Course Reviews");
+        mainStage.setScene(courseReviewsScene);
         mainStage.show();
     }
 

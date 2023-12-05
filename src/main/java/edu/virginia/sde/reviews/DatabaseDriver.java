@@ -32,7 +32,6 @@ public class DatabaseDriver {
             connection = DriverManager.getConnection("jdbc:sqlite:" + sqliteFilename);
             //the next line enables foreign key enforcement - do not delete/comment out
             connection.createStatement().execute("PRAGMA foreign_keys = ON");
-            //the next line disables auto-commit - do not delete/comment out
             connection.setAutoCommit(true);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -78,7 +77,8 @@ public class DatabaseDriver {
             statement.executeUpdate(createStudentsTable);
             String createReviewsTable = "CREATE TABLE IF NOT EXISTS Reviews ("
                     + " ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + " StudentName VARCHAR(255) NOT NULL,"
+                    + " StudentID INTEGER NOT NULL,"
+                    + " StudentName VARCHAR (255) NOT NULL,"
                     + " CourseID INTEGER NOT NULL,"
                     + " CourseSubject VARCHAR(255) NOT NULL,"
                     + " CourseNumber INTEGER NOT NULL,"
@@ -86,7 +86,7 @@ public class DatabaseDriver {
                     + " Rating INTEGER NOT NULL,"
                     + "	Comment VARCHAR(255),"
                     + " Timestamp TIMESTAMP NOT NULL,"
-                    + " FOREIGN KEY (StudentName) REFERENCES Students(Username) ON DELETE CASCADE,"
+                    + " FOREIGN KEY (StudentID) REFERENCES Students(ID) ON DELETE CASCADE,"
                     + " FOREIGN KEY (CourseID) REFERENCES Courses(ID) ON DELETE CASCADE);";
             statement.executeUpdate(createReviewsTable);
         } catch (SQLException e) {
@@ -139,22 +139,18 @@ public class DatabaseDriver {
         return courses;
     }
 
-    public Optional<Course> getCourseById(int courseID){
-        try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where ID=%s");
-            ResultSet results = statement.executeQuery();
-            statement.setInt(1, courseID);
-            if (results.next()) {
-                String subject = results.getString("Subject");
-                int courseNumber = results.getInt("CourseNumber");
-                String title = results.getString("Title");
-                return Optional.of(new Course(subject, courseNumber, title));
-            }
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    public Optional<Course> getCourseById(int courseID) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * from Courses where ID=%s");
+        ResultSet results = statement.executeQuery();
+        statement.setInt(1, courseID);
+        if (results.next()) {
+            String subject = results.getString("Subject");
+            int courseNumber = results.getInt("CourseNumber");
+            String title = results.getString("Title");
+            return Optional.of(new Course(subject, courseNumber, title));
         }
-        return Optional.empty();
+        statement.close();
+        return Optional.empty();    // Should never reach this
     }
 
     public int getCourseId(String subject, int number, String title) throws SQLException{
@@ -274,10 +270,10 @@ public class DatabaseDriver {
     }
 
     public int getStudentId(String username) throws SQLException{
-        String preparedStatement = String.format("SELECT * from Students where Username=%s", username);
+        String preparedStatement = "SELECT * from Students where Username=?";
         PreparedStatement statement = connection.prepareStatement(preparedStatement);
+        statement.setString(1, username);
         ResultSet results = statement.executeQuery();
-
         if (results.next()) {
             int id = results.getInt("ID");
             return id;
@@ -326,7 +322,7 @@ public class DatabaseDriver {
     }
 
     public Optional<String> getPasswordForStudent(Student student) throws SQLException{
-        String preparedStatement = "SELECT * from Students where username=?";
+        String preparedStatement = "SELECT * from Students where Username=?";
         PreparedStatement statement = connection.prepareStatement(preparedStatement);
         statement.setString(1, student.getUsername());
         ResultSet results = statement.executeQuery();
@@ -345,17 +341,18 @@ public class DatabaseDriver {
             ResultSet results = statement.executeQuery();
             while (results.next()) {
                 String studentName = results.getString("StudentName");
-                int courseID = results.getInt("CourseID");
+                int studentID = getStudentId(studentName);
                 String courseSubject = results.getString("CourseSubject");
                 int courseNumber = results.getInt("CourseNumber");
                 String courseTitle = results.getString("CourseTitle");
+                int courseID = getCourseId(courseSubject, courseNumber, courseTitle);
                 String comment = results.getString("Comment");
                 int rating = results.getInt("Rating");
                 Timestamp timestamp = results.getTimestamp("Timestamp");
                 if (results.wasNull()) {
                     comment = null;
                 }
-                var newReview = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
+                var newReview = new CourseReview(studentID, studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
                 newReview.setTimestamp(timestamp);  // Sets the new timestamp to have recorded timestamp
                 reviews.add(newReview);
             }
@@ -367,40 +364,43 @@ public class DatabaseDriver {
     }
 
     public void addReview(CourseReview review) throws SQLException {
-        String command = "INSERT INTO Reviews(StudentName, CourseID, CourseSubject, CourseNumber, CourseTitle, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String command = "INSERT INTO Reviews(StudentID, StudentName, CourseID, CourseSubject, CourseNumber, CourseTitle, Rating, Comment, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(command);
-        statement.setString(1, review.getPostingStudentName());
-        statement.setInt(2, review.getCourseID());
-        statement.setString(3, review.getCourseSubject());
-        statement.setInt(4, review.getCourseNumber());
-        statement.setString(5, review.getCourseTitle());
-        statement.setInt(6, review.getRating());
+        System.out.println(review.getStudentID());
+        statement.setInt(1, getStudentId(review.getPostingStudentName()));
+        statement.setString(2, review.getPostingStudentName());
+        statement.setInt(3, getCourseId(review.getCourseSubject(), review.getCourseNumber(), review.getCourseTitle()));
+        statement.setString(4, review.getCourseSubject());
+        statement.setInt(5, review.getCourseNumber());
+        statement.setString(6, review.getCourseTitle());
+        statement.setInt(7, review.getRating());
         if (review.getComment() != null) {
-            statement.setString(7, review.getComment());
+            statement.setString(8, review.getComment());
         } else {
-            statement.setNull(7, Types.VARCHAR);
+            statement.setNull(8, Types.VARCHAR);
         }
-        statement.setTimestamp(8, review.getTimestamp());
+        statement.setTimestamp(9, review.getTimestamp());
         statement.executeUpdate();
         statement.close();
     }
 
     public List<CourseReview> getReviewsFromStudent(Student student) throws SQLException {
         var reviews = new ArrayList<CourseReview>();
-        String command = "SELECT * FROM Reviews WHERE StudentName = ?";
+        String command = "SELECT * FROM Reviews WHERE StudentID = ?";
         PreparedStatement statement = connection.prepareStatement(command);
-        statement.setString(1, student.getUsername());
+        statement.setInt(1, getStudentId(student.getUsername()));
         ResultSet results = statement.executeQuery();
         while(results.next()){
-            int courseID = results.getInt("CourseID");
             String courseSubject = results.getString("CourseSubject");
             int courseNumber = results.getInt("CourseNumber");
             String courseTitle = results.getString("CourseTitle");
+            int courseID = getCourseId(courseSubject, courseNumber, courseTitle);
             String studentName = results.getString("StudentName");
+            int studentID = getStudentId(studentName);
             int rating = results.getInt("Rating");
             String comment = results.getString("Comment");
             Timestamp timestamp = results.getTimestamp("Timestamp");
-            CourseReview review = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
+            CourseReview review = new CourseReview(studentID, studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
             reviews.add(review);
         }
         statement.close();
@@ -411,18 +411,19 @@ public class DatabaseDriver {
         var reviews = new ArrayList<CourseReview>();
         String command = "SELECT * FROM Reviews WHERE CourseID = ?";
         PreparedStatement statement = connection.prepareStatement(command);
-        statement.setInt(1, course.getId());
+        statement.setInt(1, getCourseId(course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
         ResultSet results = statement.executeQuery();
         while (results.next()){
-            int courseID = results.getInt("CourseID");
             String courseSubject = results.getString("CourseSubject");
             int courseNumber = results.getInt("CourseNumber");
             String courseTitle = results.getString("CourseTitle");
+            int courseID = getCourseId(courseSubject, courseNumber, courseTitle);
             String studentName = results.getString("StudentName");
+            int studentID = getStudentId(studentName);
             int rating = results.getInt("Rating");
             String comment = results.getString("Comment");
             Timestamp timestamp = results.getTimestamp("Timestamp");
-            CourseReview review = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
+            CourseReview review = new CourseReview(studentID, studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
             reviews.add(review);
         }
         statement.close();
@@ -431,31 +432,32 @@ public class DatabaseDriver {
 
     public CourseReview getReviewOfCourseFromStudent(Course course, Student student) throws SQLException {
         CourseReview review = null;
-        String query = "SELECT * FROM Reviews WHERE StudentName = ? AND CourseID = ?";
+        String query = "SELECT * FROM Reviews WHERE StudentID = ? AND CourseID = ?";
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, student.getUsername());
+        statement.setInt(1, getStudentId(student.getUsername()));
         statement.setInt(2, getCourseId(course.getSubjectNmeumonic(),course.getCourseNumber(),course.getCourseTitle()));
         ResultSet results = statement.executeQuery();
         while (results.next()) {
-            int courseID = results.getInt("CourseID");
             String courseSubject = results.getString("CourseSubject");
             int courseNumber = results.getInt("CourseNumber");
             String courseTitle = results.getString("CourseTitle");
+            int courseID = getCourseId(courseSubject, courseNumber, courseTitle);
             String studentName = results.getString("StudentName");
+            int studentID = getStudentId(studentName);
             int rating = results.getInt("Rating");
             String comment = results.getString("Comment");
             Timestamp timestamp = results.getTimestamp("Timestamp");
             if (results.wasNull()) {
                 comment = null;
             }
-            review = new CourseReview(studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
+            review = new CourseReview(studentID, studentName, courseID, courseSubject, courseNumber, courseTitle, rating, comment, timestamp);
         }
         statement.close();
         return review;
     }
 
     public void updateReview (CourseReview newReview) throws SQLException {
-        String updateQuery = "UPDATE Reviews SET Rating = ?, Comment = ?, Timestamp = ? WHERE CourseID = ? AND StudentName = ?";
+        String updateQuery = "UPDATE Reviews SET Rating = ?, Comment = ?, Timestamp = ? WHERE CourseID = ? AND StudentID = ?";
         PreparedStatement statement = connection.prepareStatement(updateQuery);
         statement.setInt(1, newReview.getRating());
         if (newReview.getComment() != null) {
@@ -464,9 +466,18 @@ public class DatabaseDriver {
             statement.setNull(2, Types.VARCHAR);
         }
         statement.setTimestamp(3, newReview.getTimestamp());
-        // New review should be updating the old review, so courseID and posting student name is the same
-        statement.setInt(4, newReview.getCourseID());
-        statement.setString(5, newReview.getPostingStudentName());
+        // New review should be updating the old review, so courseID and PostingStudentName should be the same
+        statement.setInt(4, getCourseId(newReview.getCourseSubject(), newReview.getCourseNumber(), newReview.getCourseTitle()));
+        statement.setInt(5, getStudentId(newReview.getPostingStudentName()));
+        statement.executeUpdate();
+        statement.close();
+    }
+
+    public void deleteStudentReview(Course course, Student student) throws SQLException {
+        String command = "DELETE FROM Reviews WHERE CourseID = ? AND StudentID = ?";
+        PreparedStatement statement = connection.prepareStatement(command);
+        statement.setInt(1, getCourseId(course.getSubjectNmeumonic(), course.getCourseNumber(), course.getCourseTitle()));
+        statement.setInt(2, getStudentId(student.getUsername()));
         statement.executeUpdate();
         statement.close();
     }

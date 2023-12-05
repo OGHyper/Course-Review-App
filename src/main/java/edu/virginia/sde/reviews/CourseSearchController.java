@@ -7,6 +7,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Paint;
 import javafx.scene.control.TextField;
+
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -28,6 +30,8 @@ public class CourseSearchController implements Initializable {
     private TextField courseTitle;
     @FXML
     private Label buttonMessage;
+    @FXML
+    private Label selectCourseMsg;
     @FXML
     private ListView<Course> courseList;
 
@@ -173,10 +177,6 @@ public class CourseSearchController implements Initializable {
         application.goToMyReviews(this.loggedInStudent);
     }
 
-    public void goToCourseReviews(ActionEvent event){
-        // TODO: Implement this
-    }
-
     public void setApplication(CourseReviewsApplication application){
         this.application = application;
     }
@@ -192,6 +192,17 @@ public class CourseSearchController implements Initializable {
     public void handleButton(String message, Paint color) {
         buttonMessage.setTextFill(color);
         buttonMessage.setText(message);
+    }
+
+    public void selectCourse() throws Exception {
+        Course selectedCourse = courseList.getSelectionModel().getSelectedItem();
+        if (selectedCourse != null){
+            application.goToCourseReviews(selectedCourse, loggedInStudent);
+        }
+        else{
+            selectCourseMsg.setTextFill(red);
+            selectCourseMsg.setText("No course selected");
+        }
     }
 
     public static boolean isNumeric(String str) {

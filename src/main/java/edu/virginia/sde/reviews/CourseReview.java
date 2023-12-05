@@ -4,6 +4,7 @@ import java.sql.*;
 
 public class CourseReview {
     private int id;
+    private int studentID;
     private int courseID;
     private String courseSubject;
     private int courseNumber;
@@ -13,7 +14,8 @@ public class CourseReview {
     private String comment;
     private Timestamp timestamp;
 
-    public CourseReview(String postingStudentName, int courseID, String courseSubject, int courseNumber, String courseTitle, int rating, String comment, Timestamp timestamp) {
+    public CourseReview(int studentID, String postingStudentName, int courseID, String courseSubject, int courseNumber, String courseTitle, int rating, String comment, Timestamp timestamp) {
+        this.studentID = studentID;
         this.postingStudentName = postingStudentName;
         this.courseID = courseID;
         this.courseSubject = courseSubject;
@@ -24,6 +26,13 @@ public class CourseReview {
         this.timestamp = timestamp;
     }
 
+    public void setStudentID(int studentID){
+        this.studentID = studentID;
+    }
+
+    public int getStudentID(){
+        return this.studentID;
+    }
     public int getCourseID() {
         return courseID;
     }
@@ -78,7 +87,8 @@ public class CourseReview {
 
     public String toString(){
         //TODO: Implement this
-        return String.format("%s %d: %s\n%s: %d\nLast edited: %s", getCourseSubject(), getCourseNumber(), getCourseTitle(),
-                getPostingStudentName(), getRating(), getTimestamp().toString());
+        return String.format("%s %d: %s\nAnon: %d\nComment: %s\nLast edited: %s", getCourseSubject(),
+                getCourseNumber(), getCourseTitle(),
+                getRating(), getComment(), getTimestamp().toString());
     }
 }

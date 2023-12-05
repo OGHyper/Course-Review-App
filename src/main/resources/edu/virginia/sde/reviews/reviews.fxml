@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -15,7 +16,7 @@
             <Font size="14.0" />
          </font>
       </Button>
-      <Label fx:id="courseName" alignment="TOP_CENTER" layoutX="169.0" layoutY="4.0" prefHeight="54.0" prefWidth="262.0" text="Reviews for " textAlignment="CENTER" wrapText="true">
+      <Label fx:id="courseName" alignment="CENTER" layoutX="79.0" layoutY="9.0" prefHeight="27.0" prefWidth="452.0" text="Reviews for " textAlignment="CENTER" wrapText="true">
          <font>
             <Font size="18.0" />
          </font>
@@ -32,6 +33,11 @@
       <Label layoutX="286.0" layoutY="160.0" text="Post or update your review:" />
       <Label fx:id="studentRating1" layoutX="286.0" layoutY="182.0" text="Rating: " />
       <Label layoutX="286.0" layoutY="210.0" text="Comment: " />
-      <ChoiceBox id="ratingChoice" layoutX="327.0" layoutY="178.0" prefHeight="26.0" prefWidth="30.0" />
+      <ChoiceBox fx:id="ratingChoice" layoutX="343.0" layoutY="177.0" prefHeight="26.0" prefWidth="30.0" />
+      <TextField fx:id="newComment" alignment="TOP_LEFT" layoutX="343.0" layoutY="215.0" prefHeight="125.0" prefWidth="242.0" />
+      <Button layoutX="545.0" layoutY="341.0" mnemonicParsing="false" onAction="#postStudentReview" text="Post" />
+      <Label fx:id="buttonMessage" alignment="CENTER_RIGHT" layoutX="283.0" layoutY="367.0" prefHeight="18.0" prefWidth="303.0" />
+      <Button layoutX="496.0" layoutY="37.0" mnemonicParsing="false" onAction="#deleteStudentReview" text="Delete review" />
+      <Label fx:id="reviewDeletedMsg" layoutX="496.0" layoutY="14.0" prefHeight="18.0" prefWidth="88.0" />
    </children>
 </AnchorPane>
