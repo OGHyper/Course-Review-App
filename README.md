@@ -3,9 +3,6 @@
 
 ## Authors
 1) Philip Ma, sju4sz, [OGHyper]
-2) Name, netid, [GitHub profile name]
-3) Name, netid, [GitHub profile name]
-4) Name, netid, [GitHub profile name]
 
 ## To Run
 
@@ -18,25 +15,14 @@ List the primary contributions of each author. It is recommended to update this 
 ### [Philip Ma]
 
 * All of it
-
-### [Author 2 - replace this with their name]
-
-* Author 2 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
-
-### [Author 3 - replace this with their name]
-
-* Author 3 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
-
-### [Author 4 - replace this with their name]
-
-* Author 4 contributions
-* as a bulleted list
-* each line starts with an asterisk and a space
+* Implemented the database
+* Created Log In scene
+* Created Course Search scene
+* Created Course Reviews scene
+* Created My Reviews scene
+* Created all of their respective controllers
 
 ## Issues
 
 List any known issues (bugs, incorrect behavior, etc.) at the time of submission.
+* New courses with no reviews will show 'NaN' as the average review score instead of remaining blank. Not sure why though I've tried many different possible solutions.
