@@ -1,6 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/DC1SF4uZ)
-# Homework 6 - Responding to Change
-
+## Course Review App
 ## Authors
 1) Philip Ma, sju4sz, [OGHyper]
 
@@ -21,7 +19,3 @@ List the primary contributions of each author. It is recommended to update this 
 * Created Course Reviews scene
 * Created My Reviews scene
 * Created all of their respective controllers
-
-## Issues
-
-List any known issues (bugs, incorrect behavior, etc.) at the time of submission.
