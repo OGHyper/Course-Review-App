@@ -8,8 +8,6 @@ Run 'CourseReviewsApplication.java' with the vm argument '--module-path [PATH_TO
 
 ## Contributions
 
-List the primary contributions of each author. It is recommended to update this with your contributions after each coding session.:
-
 ### [Philip Ma]
 
 * All of it
